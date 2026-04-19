@@ -122,12 +122,11 @@ def main():
     )
 
     system_prompt = (
-        "You are given a sequence of images where exactly two consecutive images "
+        "You are given a sequence of images. Each image shows a single number representing its position in the sequence. Exactly two consecutive images "
         "have been swapped. Your task is to identify which two consecutive images "
-        "are out of order. Reply with only the position numbers of the two swapped "
-        "images, e.g. '2 and 3'."
+        "are out of order. Reply with only the position numbers of the two swapped images."
     )
-    dataset = "./datasets/single_image_cmc"
+    dataset = "./datasets/single_image_number"
 
     all_scenario_dirs = [
         os.path.join(dataset, name)
