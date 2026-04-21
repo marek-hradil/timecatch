@@ -1103,13 +1103,13 @@ wheels = [
 
 [[package]]
 name = "nobodywho"
-version = "0.9.1"
+version = "1.1.0"
 source = { registry = "https://pypi.org/simple" }
 wheels = [
-    { url = "https://files.pythonhosted.org/packages/d0/54/a4fadcf8f53c8155398878ec7ee7e3dd77cc58e532029383b540cd3b5e6f/nobodywho-0.9.1-cp38-abi3-macosx_11_0_arm64.whl", hash = "sha256:61d44f40e54edde504691d3a9066c597a4994cc258356c55a972b02cc526e339", size = 6943501, upload-time = "2026-03-19T08:17:58.317Z" },
-    { url = "https://files.pythonhosted.org/packages/0d/1e/98c2b7f2d83bd2693474555175eac1205e2693059e9dd2dd79dea38a271b/nobodywho-0.9.1-cp38-abi3-manylinux_2_34_aarch64.whl", hash = "sha256:8d1ca2f9181eb0aecbbc69aea11962881de1605c72005e2db009e75262df4230", size = 17521238, upload-time = "2026-03-19T08:18:00.52Z" },
-    { url = "https://files.pythonhosted.org/packages/cf/49/1574aa3f6c509853ff53709ac52246c58687878006157e7b65c7f80081bc/nobodywho-0.9.1-cp38-abi3-manylinux_2_34_x86_64.whl", hash = "sha256:277379d360dbf8c7d7e6550c4c4ccbe1b26ae22dc482c9c69d50256c6b1060c2", size = 19827215, upload-time = "2026-03-19T08:18:03.403Z" },
-    { url = "https://files.pythonhosted.org/packages/bf/25/df801d674bfdc1d490e8c7618dede4d87555956118158b3d314b77c694ec/nobodywho-0.9.1-cp38-abi3-win_amd64.whl", hash = "sha256:400b2b17a176cc7b422f97cce0f68713d80eb13ca4091f60bf71760e5684b73b", size = 21854181, upload-time = "2026-03-19T08:18:06.273Z" },
+    { url = "https://files.pythonhosted.org/packages/be/67/54fcec287073d0ce1af740df751863e87b06e508548024ed7ce40d3ddc7c/nobodywho-1.1.0-cp38-abi3-macosx_11_0_arm64.whl", hash = "sha256:0b91fc17b1d0cf58fa16284cd30b1d53a217c33f2f2a5576e9ce81a3886c52cb", size = 11042939, upload-time = "2026-04-18T13:15:08.179Z" },
+    { url = "https://files.pythonhosted.org/packages/cf/cd/58187e61682d1dfd46e956a0077843ec735965671c88fd496d7179db5daf/nobodywho-1.1.0-cp38-abi3-manylinux_2_34_aarch64.whl", hash = "sha256:00fb8491fd0247247be03860d3bde8899a7b53c4c98438264d2bbe2171de4d3d", size = 22331624, upload-time = "2026-04-18T13:15:10.491Z" },
+    { url = "https://files.pythonhosted.org/packages/d5/ad/74525798343af044103371effc39674750adcb64518c07a058d8f2000778/nobodywho-1.1.0-cp38-abi3-manylinux_2_34_x86_64.whl", hash = "sha256:48a7b2a8dde88131c28f8da0eaa70322c75dc7eaf78f8900d4337a58cc08d736", size = 24812279, upload-time = "2026-04-18T13:15:12.707Z" },
+    { url = "https://files.pythonhosted.org/packages/be/43/fbd394cd940f9b9c3dc0edbb5a13fe84760b51e83ec702ded57e59be1f50/nobodywho-1.1.0-cp38-abi3-win_amd64.whl", hash = "sha256:776fb3499340a78b4cbf7e1ab6e1da3e81418990ee9091e9bc4df0be8fa47811", size = 26913135, upload-time = "2026-04-18T13:15:15.192Z" },
 ]
 
 [[package]]
@@ -1965,7 +1965,7 @@ requires-dist = [
     { name = "accelerate", specifier = ">=1.13.0" },
     { name = "matplotlib", specifier = ">=3.9" },
     { name = "mlx-vlm", specifier = ">=0.4.4" },
-    { name = "nobodywho", specifier = ">=0.9.1" },
+    { name = "nobodywho", specifier = ">=1.1.0" },
     { name = "torch", specifier = ">=2.11.0" },
     { name = "transformers", specifier = ">=5.5.4" },
 ]
