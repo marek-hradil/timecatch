@@ -11,4 +11,6 @@ dependencies = [
     "transformers>=5.5.4",
     "accelerate>=1.13.0",
     "mlx-vlm>=0.4.4",
+    "scikit-image>=0.26.0",
+    "tqdm>=4.67.3",
 ]
