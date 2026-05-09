@@ -21,6 +21,9 @@ CRAFT_ROOT = Path(__file__).parent.parent / "datasets" / "CRAFT"
 OUT_ROOT = Path(__file__).parent.parent / "datasets" / "CRAFT_frames"
 FRAMES_ROOT = OUT_ROOT / "frames"
 MAX_SCENES_PER_SID = 20
+SPLIT_FILE = CRAFT_ROOT / "split_info_random.json"
+FULL_DATASET = CRAFT_ROOT / "dataset.json"
+SIM_FPS = 75.0
 
 
 # --- I/O helpers -------------------------------------------------------------
@@ -29,6 +32,18 @@ MAX_SCENES_PER_SID = 20
 def load_dataset(path: Path) -> list[dict]:
     with open(path) as f:
         return json.load(f)
+
+
+def load_test_entries(dataset: list[dict], split_path: Path) -> list[dict]:
+    with open(split_path) as f:
+        split = json.load(f)
+    test_keys = {(e["video_index"], e["question_index"]) for e in split["test"]}
+    filtered = [
+        e for e in dataset
+        if (e["video_index"], e["question_index"]) in test_keys
+    ]
+    print(f"Test split: {len(filtered)}/{len(dataset)} entries retained.")
+    return filtered
 
 
 def save_dataset(entries: list[dict], path: Path) -> None:
@@ -169,14 +184,134 @@ def build_frame_index(entries: list[dict]) -> dict[str, list[str]]:
     return {rel: process_video(rel, i, total) for i, rel in enumerate(unique, 1)}
 
 
+# --- Scene text extraction ---------------------------------------------------
+
+
+def _extract_object_labels(questions: list[dict]) -> dict[int, dict]:
+    """Scan all filter steps to build {obj_idx: {size, color, shape}}."""
+    labels: dict[int, dict] = {}
+    for q in questions:
+        for step in q["program"]:
+            t = step["type"]
+            vi = step.get("value_inputs", [])
+            out = step.get("_output")
+            if t in ("filter_color", "filter_shape", "filter_size") and vi and isinstance(out, list):
+                attr = t[len("filter_"):]
+                for obj in out:
+                    if isinstance(obj, int):
+                        labels.setdefault(obj, {})[attr] = vi[0]
+    return labels
+
+
+def _extract_dynamic_objects(questions: list[dict]) -> set[int]:
+    dynamic: set[int] = set()
+    for q in questions:
+        for step in q["program"]:
+            if step["type"] == "filter_dynamic_objects" and isinstance(step.get("_output"), list):
+                dynamic.update(o for o in step["_output"] if isinstance(o, int))
+    return dynamic
+
+
+def _extract_events(questions: list[dict]) -> list[dict]:
+    """Return the canonical physics event list from the first 'events' step found."""
+    for q in questions:
+        for step in q["program"]:
+            if step["type"] == "events" and isinstance(step.get("_output"), list):
+                return [e for e in step["_output"] if isinstance(e, dict)]
+    return []
+
+
+def _fmt_obj(idx: int, labels: dict[int, dict]) -> str:
+    props = labels.get(idx, {})
+    desc = " ".join(p for p in [props.get("size"), props.get("color"), props.get("shape")] if p)
+    return desc or f"object {idx}"
+
+
+def build_scene_text(questions: list[dict]) -> str:
+    labels = _extract_object_labels(questions)
+    dynamic = _extract_dynamic_objects(questions)
+    events = _extract_events(questions)
+
+    # Identify basket: static object appearing as objects[0] in ContainerEndUp events
+    basket_ids = {
+        e["objects"][0]
+        for e in events
+        if e["type"] == "ContainerEndUp" and len(e.get("objects", [])) >= 2
+    }
+
+    def fmt(idx: int) -> str:
+        if idx in basket_ids:
+            return "basket"
+        if idx not in dynamic:
+            return "wall/ramp"
+        return _fmt_obj(idx, labels)
+
+    obj_descs = [_fmt_obj(i, labels) for i in sorted(dynamic)]
+    objects_line = "Objects: " + (", ".join(obj_descs) if obj_descs else "unknown")
+
+    # Deduplicate: keep first occurrence of each (event_type, unordered_pair).
+    # Collision events repeat dozens of times per pair — one mention is enough.
+    seen: set[tuple] = set()
+    lines: list[tuple[int, str]] = []
+
+    for e in events:
+        t = e["type"]
+        if t in ("Start", "End"):
+            continue
+        objs = e.get("objects", [])
+        step = e["step"]
+        pair = tuple(sorted(objs[:2])) if len(objs) >= 2 else tuple(objs)
+        key = (t, pair)
+        if key in seen:
+            continue
+        seen.add(key)
+
+        time_s = step / SIM_FPS
+        a = fmt(objs[0]) if len(objs) > 0 else "?"
+        b = fmt(objs[1]) if len(objs) > 1 else "?"
+
+        if t == "Collision":
+            line = f"  {time_s:.2f}s: {a} collides with {b}"
+        elif t == "StartTouching":
+            line = f"  {time_s:.2f}s: {a} starts touching {b}"
+        elif t == "EndTouching":
+            line = f"  {time_s:.2f}s: {a} stops touching {b}"
+        elif t == "ContainerEndUp":
+            # objects[0] is basket (static), objects[1] is the entering object
+            entering = fmt(objs[1]) if len(objs) > 1 else "?"
+            line = f"  {time_s:.2f}s: {entering} enters basket"
+        else:
+            line = f"  {time_s:.2f}s: {t} {a} {b}"
+
+        lines.append((step, line))
+
+    lines.sort()
+    return objects_line + "\nEvents:\n" + "\n".join(l for _, l in lines)
+
+
+def build_scene_index(full_entries: list[dict]) -> dict[int, str]:
+    """Returns {video_index: scene_text} for every video in the full dataset."""
+    return {
+        entry["questions"]["info"]["video_index"]: build_scene_text(entry["questions"]["questions"])
+        for entry in full_entries
+    }
+
+
 # --- Dataset enrichment ------------------------------------------------------
 
 
 def enrich_entries(
-    entries: list[dict], frame_index: dict[str, list[str]]
+    entries: list[dict],
+    frame_index: dict[str, list[str]],
+    scene_index: dict[int, str],
 ) -> list[dict]:
     return [
-        {**e, "frame_paths": frame_index.get(e["video_file_path"], [])} for e in entries
+        {
+            **e,
+            "frame_paths": frame_index.get(e["video_file_path"], []),
+            "scene_text": scene_index.get(e["video_index"], ""),
+        }
+        for e in entries
     ]
 
 
@@ -185,8 +320,13 @@ def enrich_entries(
 
 def main():
     entries = load_dataset(CRAFT_ROOT / "dataset_minimal.json")
+    entries = load_test_entries(entries, SPLIT_FILE)
     frame_index = build_frame_index(entries)
-    enriched = enrich_entries(entries, frame_index)
+
+    print("Building scene text index...")
+    scene_index = build_scene_index(load_dataset(FULL_DATASET))
+
+    enriched = enrich_entries(entries, frame_index, scene_index)
 
     kept = trim_all_sids(FRAMES_ROOT, MAX_SCENES_PER_SID)
     enriched = filter_entries_by_kept(enriched, kept)

@@ -1,0 +1,176 @@
+"""
+Sample 1 frame/second from each CLEVRER .mp4 clip and write a CLEVRER_frames dataset.
+
+Output layout:
+  datasets/CLEVRER_frames/
+    frames/
+      video_13005/
+        frame_000.jpg
+        frame_001.jpg
+        ...
+    dataset.json   -- one entry per video with frame_paths and scene_text
+"""
+
+import json
+from pathlib import Path
+
+import cv2
+
+CLEVRER_ROOT = Path(__file__).parent.parent.parent / "datasets" / "CLEVRER"
+OUT_ROOT = Path(__file__).parent.parent.parent / "datasets" / "CLEVRER_frames"
+FRAMES_ROOT = OUT_ROOT / "frames"
+ANNOTATIONS_ROOT = CLEVRER_ROOT / "annotations" / "annotation_validation"
+SAMPLES_ROOT = CLEVRER_ROOT / "samples"
+VIDEO_FPS = 25.0
+
+
+# --- I/O helpers -------------------------------------------------------------
+
+
+def load_annotation(path: Path) -> dict:
+    with open(path) as f:
+        return json.load(f)
+
+
+def save_dataset(entries: list[dict], path: Path) -> None:
+    path.parent.mkdir(parents=True, exist_ok=True)
+    with open(path, "w") as f:
+        json.dump(entries, f, indent=2)
+
+
+# --- Path helpers ------------------------------------------------------------
+
+
+def find_all_annotations() -> list[Path]:
+    return sorted(ANNOTATIONS_ROOT.glob("annotation_*/*.json"))
+
+
+def video_path(video_filename: str) -> Path | None:
+    vid_id = Path(video_filename).stem  # "video_13005"
+    num = int(vid_id.split("_")[1])
+    bucket_start = (num // 1000) * 1000
+    bucket = f"video_{bucket_start}-{bucket_start + 1000}"
+    p = SAMPLES_ROOT / bucket / video_filename
+    return p if p.exists() else None
+
+
+def frame_out_dir(video_filename: str) -> Path:
+    vid_id = Path(video_filename).stem
+    return FRAMES_ROOT / vid_id
+
+
+def cached_frames(out_dir: Path) -> list[str] | None:
+    if out_dir.exists() and any(out_dir.iterdir()):
+        return sorted(str(p.relative_to(OUT_ROOT)) for p in out_dir.glob("*.jpg"))
+    return None
+
+
+# --- Sampling ----------------------------------------------------------------
+
+
+def open_video(path: Path) -> cv2.VideoCapture | None:
+    cap = cv2.VideoCapture(str(path))
+    return cap if cap.isOpened() else None
+
+
+def extract_frames(cap: cv2.VideoCapture, out_dir: Path) -> list[str]:
+    out_dir.mkdir(parents=True, exist_ok=True)
+
+    fps = cap.get(cv2.CAP_PROP_FPS) or VIDEO_FPS
+    step = max(1, round(fps))
+
+    saved, frame_idx, sample_idx = [], 0, 0
+    while True:
+        ret, frame = cap.read()
+        if not ret:
+            break
+        if frame_idx % step == 0:
+            out_path = out_dir / f"frame_{sample_idx:03d}.jpg"
+            cv2.imwrite(str(out_path), frame)
+            saved.append(str(out_path.relative_to(OUT_ROOT)))
+            sample_idx += 1
+        frame_idx += 1
+
+    return saved
+
+
+def sample_video(vid_path: Path, out_dir: Path) -> list[str]:
+    cap = open_video(vid_path)
+    if cap is None:
+        print(f"  WARNING: could not open {vid_path}")
+        return []
+    frames = extract_frames(cap, out_dir)
+    cap.release()
+    return frames
+
+
+def process_video(video_filename: str, idx: int, total: int) -> list[str]:
+    out_dir = frame_out_dir(video_filename)
+
+    frames = cached_frames(out_dir)
+    if frames is not None:
+        print(f"  [{idx}/{total}] skip (cached) {video_filename}  ({len(frames)} frames)")
+        return frames
+
+    vid_path = video_path(video_filename)
+    if vid_path is None:
+        print(f"  [{idx}/{total}] MISSING {video_filename}")
+        return []
+
+    frames = sample_video(vid_path, out_dir)
+    print(f"  [{idx}/{total}] {video_filename}  -> {len(frames)} frames")
+    return frames
+
+
+# --- Scene text --------------------------------------------------------------
+
+
+def build_scene_text(annotation: dict) -> str:
+    props = {o["object_id"]: o for o in annotation["object_property"]}
+
+    def fmt(obj_id: int) -> str:
+        o = props.get(obj_id, {})
+        parts = [o.get("color"), o.get("material"), o.get("shape")]
+        return " ".join(p for p in parts if p) or f"object {obj_id}"
+
+    obj_descs = [fmt(oid) for oid in sorted(props)]
+    objects_line = "Objects: " + ", ".join(obj_descs)
+
+    lines = []
+    for c in sorted(annotation["collision"], key=lambda c: c["frame_id"]):
+        time_s = c["frame_id"] / VIDEO_FPS
+        a, b = fmt(c["object_ids"][0]), fmt(c["object_ids"][1])
+        lines.append(f"  {time_s:.2f}s: {a} collides with {b}")
+
+    return objects_line + "\nEvents:\n" + "\n".join(lines)
+
+
+# --- Entry point -------------------------------------------------------------
+
+
+def main():
+    ann_paths = find_all_annotations()
+    total = len(ann_paths)
+    print(f"Found {total} annotation files.")
+
+    entries = []
+    for idx, ann_path in enumerate(ann_paths, 1):
+        ann = load_annotation(ann_path)
+        video_filename = ann["video_filename"]
+
+        frame_paths = process_video(video_filename, idx, total)
+        scene_text = build_scene_text(ann)
+
+        entries.append({
+            "video_index": ann["scene_index"],
+            "video_filename": video_filename,
+            "frame_paths": frame_paths,
+            "scene_text": scene_text,
+        })
+
+    save_dataset(entries, OUT_ROOT / "dataset.json")
+    print(f"\nDone. {len(entries)} entries written to {OUT_ROOT / 'dataset.json'}")
+
+
+if __name__ == "__main__":
+    main()
