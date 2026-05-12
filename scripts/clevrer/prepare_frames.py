@@ -1,12 +1,12 @@
 """
-Sample 1 frame/second from each CLEVRER .mp4 clip and write a CLEVRER_frames dataset.
+Sample ~1.5 frames/second from each CLEVRER .mp4 clip and write frames into the CLEVRER dataset.
 
 Output layout:
-  datasets/CLEVRER_frames/
-    frames/
-      video_13005/
-        frame_000.jpg
-        frame_001.jpg
+  datasets/CLEVRER/
+    scenes/
+      scene_13005/
+        0.jpg
+        1.jpg
         ...
     dataset.json   -- one entry per video with frame_paths and scene_text
 """
@@ -17,8 +17,8 @@ from pathlib import Path
 import cv2
 
 CLEVRER_ROOT = Path(__file__).parent.parent.parent / "datasets" / "CLEVRER"
-OUT_ROOT = Path(__file__).parent.parent.parent / "datasets" / "CLEVRER_frames"
-FRAMES_ROOT = OUT_ROOT / "frames"
+OUT_ROOT = Path(__file__).parent.parent.parent / "datasets" / "CLEVRER"
+FRAMES_ROOT = OUT_ROOT / "scenes"
 ANNOTATIONS_ROOT = CLEVRER_ROOT / "annotations" / "annotation_validation"
 SAMPLES_ROOT = CLEVRER_ROOT / "samples"
 VIDEO_FPS = 25.0
@@ -55,8 +55,9 @@ def video_path(video_filename: str) -> Path | None:
 
 
 def frame_out_dir(video_filename: str) -> Path:
-    vid_id = Path(video_filename).stem
-    return FRAMES_ROOT / vid_id
+    vid_id = Path(video_filename).stem  # "video_13005"
+    scene_id = vid_id.replace("video_", "scene_")
+    return FRAMES_ROOT / scene_id
 
 
 def cached_frames(out_dir: Path) -> list[str] | None:
@@ -77,7 +78,7 @@ def extract_frames(cap: cv2.VideoCapture, out_dir: Path) -> list[str]:
     out_dir.mkdir(parents=True, exist_ok=True)
 
     fps = cap.get(cv2.CAP_PROP_FPS) or VIDEO_FPS
-    step = max(1, round(fps))
+    step = max(1, round(fps / 1.5))
 
     saved, frame_idx, sample_idx = [], 0, 0
     while True:
@@ -85,7 +86,7 @@ def extract_frames(cap: cv2.VideoCapture, out_dir: Path) -> list[str]:
         if not ret:
             break
         if frame_idx % step == 0:
-            out_path = out_dir / f"frame_{sample_idx:03d}.jpg"
+            out_path = out_dir / f"{sample_idx}.jpg"
             cv2.imwrite(str(out_path), frame)
             saved.append(str(out_path.relative_to(OUT_ROOT)))
             sample_idx += 1
@@ -109,7 +110,9 @@ def process_video(video_filename: str, idx: int, total: int) -> list[str]:
 
     frames = cached_frames(out_dir)
     if frames is not None:
-        print(f"  [{idx}/{total}] skip (cached) {video_filename}  ({len(frames)} frames)")
+        print(
+            f"  [{idx}/{total}] skip (cached) {video_filename}  ({len(frames)} frames)"
+        )
         return frames
 
     vid_path = video_path(video_filename)
@@ -125,24 +128,38 @@ def process_video(video_filename: str, idx: int, total: int) -> list[str]:
 # --- Scene text --------------------------------------------------------------
 
 
+_SHAPE_MAP = {"sphere": "ball"}
+
+
 def build_scene_text(annotation: dict) -> str:
     props = {o["object_id"]: o for o in annotation["object_property"]}
 
-    def fmt(obj_id: int) -> str:
+    def fmt(obj_id: int) -> str | None:
         o = props.get(obj_id, {})
-        parts = [o.get("color"), o.get("material"), o.get("shape")]
-        return " ".join(p for p in parts if p) or f"object {obj_id}"
+        color = o.get("color", "")
+        shape = _SHAPE_MAP.get(o.get("shape", ""), o.get("shape", ""))
+        desc = f"{color} {shape}".strip()
+        return desc or None
 
-    obj_descs = [fmt(oid) for oid in sorted(props)]
-    objects_line = "Objects: " + ", ".join(obj_descs)
-
-    lines = []
+    seen: set[str] = set()
+    parts: list[str] = []
     for c in sorted(annotation["collision"], key=lambda c: c["frame_id"]):
-        time_s = c["frame_id"] / VIDEO_FPS
-        a, b = fmt(c["object_ids"][0]), fmt(c["object_ids"][1])
-        lines.append(f"  {time_s:.2f}s: {a} collides with {b}")
+        a = fmt(c["object_ids"][0])
+        b = fmt(c["object_ids"][1])
+        if not a or not b:
+            continue
+        sentence = f"{a} will collide with {b}"
+        if sentence not in seen:
+            seen.add(sentence)
+            parts.append(sentence)
 
-    return objects_line + "\nEvents:\n" + "\n".join(lines)
+    if not parts:
+        names = [fmt(oid) for oid in sorted(props)]
+        names = [n for n in names if n]
+        return "In the scene, " + ", ".join(names) + " are present."
+    if len(parts) == 1:
+        return f"In the scene, {parts[0]}."
+    return "In the scene, " + ", and ".join([", ".join(parts[:-1]), parts[-1]]) + "."
 
 
 # --- Entry point -------------------------------------------------------------
@@ -161,12 +178,14 @@ def main():
         frame_paths = process_video(video_filename, idx, total)
         scene_text = build_scene_text(ann)
 
-        entries.append({
-            "video_index": ann["scene_index"],
-            "video_filename": video_filename,
-            "frame_paths": frame_paths,
-            "scene_text": scene_text,
-        })
+        entries.append(
+            {
+                "video_index": ann["scene_index"],
+                "video_filename": video_filename,
+                "frame_paths": frame_paths,
+                "scene_text": scene_text,
+            }
+        )
 
     save_dataset(entries, OUT_ROOT / "dataset.json")
     print(f"\nDone. {len(entries)} entries written to {OUT_ROOT / 'dataset.json'}")

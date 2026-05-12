@@ -1,15 +1,14 @@
 """
-Sample 1 frame/second from each CRAFT .mpg clip and write a CRAFT_frames dataset.
+Sample ~1.5 frames/second from each CRAFT .mpg clip and write frames into the CRAFT dataset.
 
 Output layout:
-  datasets/CRAFT_frames/
-    frames/
-      sid_1/
-        000000/
-          frame_000.jpg
-          frame_001.jpg
+  datasets/CRAFT/
+    scenes/
+      scene_1_000000/
+        0.jpg
+        1.jpg
           ...
-    dataset.json   -- original QA entries + "frame_paths" list
+    scenes.json   -- original QA entries + "frame_paths" + "scene_text"
 """
 
 import json
@@ -17,10 +16,9 @@ from pathlib import Path
 
 import cv2
 
-CRAFT_ROOT = Path(__file__).parent.parent / "datasets" / "CRAFT"
-OUT_ROOT = Path(__file__).parent.parent / "datasets" / "CRAFT_frames"
-FRAMES_ROOT = OUT_ROOT / "frames"
-MAX_SCENES_PER_SID = 20
+CRAFT_ROOT = Path(__file__).parent.parent.parent / "datasets" / "CRAFT"
+OUT_ROOT = Path(__file__).parent.parent.parent / "datasets" / "CRAFT"
+FRAMES_ROOT = OUT_ROOT / "scenes"
 SPLIT_FILE = CRAFT_ROOT / "split_info_random.json"
 FULL_DATASET = CRAFT_ROOT / "dataset.json"
 SIM_FPS = 75.0
@@ -60,11 +58,11 @@ def video_abs_path(craft_root: Path, rel_path: str) -> Path:
 
 
 def frame_out_dir(frames_root: Path, rel_path: str) -> Path:
-    """Map './videos/sid_1/000000.mpg' -> frames_root/sid_1/000000/"""
+    """Map './videos/sid_1/000000.mpg' -> frames_root/scene_1_000000/"""
     parts = Path(rel_path).parts
-    sid = parts[-2]
-    clip = Path(parts[-1]).stem
-    return frames_root / sid / clip
+    sid_num = parts[-2].split("_")[1]  # "sid_1" -> "1"
+    clip = Path(parts[-1]).stem        # "000000"
+    return frames_root / f"scene_{sid_num}_{clip}"
 
 
 def cached_frames(out_dir: Path) -> list[str] | None:
@@ -87,7 +85,7 @@ def extract_frames(cap: cv2.VideoCapture, out_dir: Path) -> list[str]:
     out_dir.mkdir(parents=True, exist_ok=True)
 
     fps = cap.get(cv2.CAP_PROP_FPS) or 75.0
-    step = max(1, round(fps))
+    step = max(1, round(fps * 1.5))
 
     saved, frame_idx, sample_idx = [], 0, 0
     while True:
@@ -95,7 +93,7 @@ def extract_frames(cap: cv2.VideoCapture, out_dir: Path) -> list[str]:
         if not ret:
             break
         if frame_idx % step == 0:
-            out_path = out_dir / f"frame_{sample_idx:03d}.jpg"
+            out_path = out_dir / f"{sample_idx}.jpg"
             cv2.imwrite(str(out_path), frame)
             saved.append(str(out_path.relative_to(OUT_ROOT)))
             sample_idx += 1
@@ -112,48 +110,6 @@ def sample_video(video_path: Path, out_dir: Path) -> list[str]:
     frames = extract_frames(cap, out_dir)
     cap.release()
     return frames
-
-
-# --- Scene trimming ----------------------------------------------------------
-
-
-def trim_sid_folder(sid_dir: Path, max_scenes: int) -> list[str]:
-    """Delete clip dirs beyond the first max_scenes in a sid folder. Returns kept clip names."""
-    clip_dirs = sorted(sid_dir.iterdir()) if sid_dir.exists() else []
-    kept, removed = clip_dirs[:max_scenes], clip_dirs[max_scenes:]
-    for clip_dir in removed:
-        for f in clip_dir.glob("*"):
-            f.unlink()
-        clip_dir.rmdir()
-    if removed:
-        print(
-            f"  trimmed {sid_dir.name}: removed {len(removed)} clips, kept {len(kept)}"
-        )
-    return [d.name for d in kept]
-
-
-def trim_all_sids(frames_root: Path, max_scenes: int) -> dict[str, set[str]]:
-    """Trim every sid_N folder. Returns {sid_name: {kept_clip_stems}}."""
-    result = {}
-    for sid_dir in sorted(frames_root.iterdir()):
-        if sid_dir.is_dir():
-            result[sid_dir.name] = set(trim_sid_folder(sid_dir, max_scenes))
-    return result
-
-
-def filter_entries_by_kept(
-    entries: list[dict], kept: dict[str, set[str]]
-) -> list[dict]:
-    """Keep only entries whose clip is in the kept set for its sid."""
-
-    def is_kept(entry: dict) -> bool:
-        parts = Path(
-            entry["video_file_path"]
-        ).parts  # ('.', 'videos', 'sid_1', '000000.mpg')
-        sid, clip_stem = parts[-2], Path(parts[-1]).stem
-        return clip_stem in kept.get(sid, set())
-
-    return [e for e in entries if is_kept(e)]
 
 
 # --- Per-video orchestration -------------------------------------------------
@@ -188,7 +144,6 @@ def build_frame_index(entries: list[dict]) -> dict[str, list[str]]:
 
 
 def _extract_object_labels(questions: list[dict]) -> dict[int, dict]:
-    """Scan all filter steps to build {obj_idx: {size, color, shape}}."""
     labels: dict[int, dict] = {}
     for q in questions:
         for step in q["program"]:
@@ -213,7 +168,6 @@ def _extract_dynamic_objects(questions: list[dict]) -> set[int]:
 
 
 def _extract_events(questions: list[dict]) -> list[dict]:
-    """Return the canonical physics event list from the first 'events' step found."""
     for q in questions:
         for step in q["program"]:
             if step["type"] == "events" and isinstance(step.get("_output"), list):
@@ -221,10 +175,16 @@ def _extract_events(questions: list[dict]) -> list[dict]:
     return []
 
 
-def _fmt_obj(idx: int, labels: dict[int, dict]) -> str:
+def _fmt_obj(idx: int, labels: dict[int, dict], dynamic: set[int], basket_ids: set[int]) -> str | None:
+    if idx in basket_ids:
+        return "basket"
+    if idx not in dynamic:
+        return None  # wall/ramp
     props = labels.get(idx, {})
-    desc = " ".join(p for p in [props.get("size"), props.get("color"), props.get("shape")] if p)
-    return desc or f"object {idx}"
+    if not props.get("color") and not props.get("shape"):
+        return None  # incomplete label — skip rather than emit "object N"
+    parts = [p for p in [props.get("size"), props.get("color"), props.get("shape")] if p]
+    return " ".join(parts)
 
 
 def build_scene_text(questions: list[dict]) -> str:
@@ -232,65 +192,52 @@ def build_scene_text(questions: list[dict]) -> str:
     dynamic = _extract_dynamic_objects(questions)
     events = _extract_events(questions)
 
-    # Identify basket: static object appearing as objects[0] in ContainerEndUp events
     basket_ids = {
         e["objects"][0]
         for e in events
         if e["type"] == "ContainerEndUp" and len(e.get("objects", [])) >= 2
     }
 
-    def fmt(idx: int) -> str:
-        if idx in basket_ids:
-            return "basket"
-        if idx not in dynamic:
-            return "wall/ramp"
-        return _fmt_obj(idx, labels)
+    def fmt(idx: int) -> str | None:
+        return _fmt_obj(idx, labels, dynamic, basket_ids)
 
-    obj_descs = [_fmt_obj(i, labels) for i in sorted(dynamic)]
-    objects_line = "Objects: " + (", ".join(obj_descs) if obj_descs else "unknown")
-
-    # Deduplicate: keep first occurrence of each (event_type, unordered_pair).
-    # Collision events repeat dozens of times per pair — one mention is enough.
-    seen: set[tuple] = set()
-    lines: list[tuple[int, str]] = []
+    seen_sentences: set[str] = set()
+    parts: list[tuple[int, str]] = []
 
     for e in events:
         t = e["type"]
-        if t in ("Start", "End"):
+        if t in ("Start", "End", "StartTouching", "EndTouching"):
             continue
         objs = e.get("objects", [])
-        step = e["step"]
-        pair = tuple(sorted(objs[:2])) if len(objs) >= 2 else tuple(objs)
-        key = (t, pair)
-        if key in seen:
-            continue
-        seen.add(key)
 
-        time_s = step / SIM_FPS
-        a = fmt(objs[0]) if len(objs) > 0 else "?"
-        b = fmt(objs[1]) if len(objs) > 1 else "?"
-
+        sentence = None
         if t == "Collision":
-            line = f"  {time_s:.2f}s: {a} collides with {b}"
-        elif t == "StartTouching":
-            line = f"  {time_s:.2f}s: {a} starts touching {b}"
-        elif t == "EndTouching":
-            line = f"  {time_s:.2f}s: {a} stops touching {b}"
+            a = fmt(objs[0]) if objs else None
+            b = fmt(objs[1]) if len(objs) > 1 else None
+            if a and b and "basket" not in (a, b):
+                sentence = f"{a} will collide with {b}"
         elif t == "ContainerEndUp":
-            # objects[0] is basket (static), objects[1] is the entering object
-            entering = fmt(objs[1]) if len(objs) > 1 else "?"
-            line = f"  {time_s:.2f}s: {entering} enters basket"
-        else:
-            line = f"  {time_s:.2f}s: {t} {a} {b}"
+            entering = fmt(objs[1]) if len(objs) > 1 else None
+            if entering and entering != "basket":
+                sentence = f"{entering} will enter the basket"
 
-        lines.append((step, line))
+        if sentence and sentence not in seen_sentences:
+            seen_sentences.add(sentence)
+            parts.append((e["step"], sentence))
 
-    lines.sort()
-    return objects_line + "\nEvents:\n" + "\n".join(l for _, l in lines)
+    parts.sort()
+    event_strs = [s for _, s in parts]
+
+    if not event_strs:
+        obj_descs = [fmt(i) for i in sorted(dynamic)]
+        names = ", ".join(o for o in obj_descs if o and o != "basket") or "unknown objects"
+        return f"In the scene, {names} are present."
+    if len(event_strs) == 1:
+        return f"In the scene, {event_strs[0]}."
+    return "In the scene, " + ", and ".join([", ".join(event_strs[:-1]), event_strs[-1]]) + "."
 
 
 def build_scene_index(full_entries: list[dict]) -> dict[int, str]:
-    """Returns {video_index: scene_text} for every video in the full dataset."""
     return {
         entry["questions"]["info"]["video_index"]: build_scene_text(entry["questions"]["questions"])
         for entry in full_entries
@@ -328,11 +275,8 @@ def main():
 
     enriched = enrich_entries(entries, frame_index, scene_index)
 
-    kept = trim_all_sids(FRAMES_ROOT, MAX_SCENES_PER_SID)
-    enriched = filter_entries_by_kept(enriched, kept)
-
-    save_dataset(enriched, OUT_ROOT / "dataset.json")
-    print(f"\nDone. {len(enriched)} entries written to {OUT_ROOT / 'dataset.json'}")
+    save_dataset(enriched, OUT_ROOT / "scenes.json")
+    print(f"\nDone. {len(enriched)} entries written to {OUT_ROOT / 'scenes.json'}")
 
 
 if __name__ == "__main__":
