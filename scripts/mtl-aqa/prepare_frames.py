@@ -2,7 +2,7 @@
 Clean up MTL-AQA frames in-place:
   1. Delete clip folders not in the test split.
   2. Delete frames outside [start_frame, end_frame] within each test clip.
-  3. Subsample to 1 frame per 0.5 s (every VIDEO_FPS * 0.5 frames by index).
+  3. Subsample to 1 frame per 1 s (every VIDEO_FPS * 1.0 frames by index).
 """
 
 import pickle
@@ -11,7 +11,7 @@ from pathlib import Path
 
 MTL_ROOT = Path(__file__).parent.parent.parent / "datasets" / "MTL-AQA"
 VIDEO_FPS = 25.0
-SAMPLE_INTERVAL = round(VIDEO_FPS * 0.5)  # 1 frame per 0.5 s
+SAMPLE_INTERVAL = round(VIDEO_FPS * 1.0)  # 1 frame per 1 s
 
 
 def load_pickle(path: Path):

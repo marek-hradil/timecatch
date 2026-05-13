@@ -3,9 +3,10 @@ import os
 import sys
 from collections import Counter
 
+import lpips
 import numpy as np
+import torch
 from PIL import Image
-from skimage.metrics import structural_similarity
 from tqdm import tqdm
 
 DATASETS = {
@@ -22,8 +23,8 @@ def dataset_dir(name: str) -> str:
     return os.path.join(ROOT, "datasets", DATASETS[name])
 
 
-def load_scenes(dataset_dir: str) -> list:
-    with open(os.path.join(dataset_dir, "scenes.json")) as f:
+def load_scenes(dataset_dir: str, json_file: str = "scenes.json") -> list:
+    with open(os.path.join(dataset_dir, json_file)) as f:
         return json.load(f)
 
 
@@ -41,6 +42,17 @@ def print_frame_histogram(scenes: list):
         bar = "#" * (frame_counts[n] // 10)
         print(f"  {n}: {bar} ({frame_counts[n]})")
 
+    in_range = sum(c for n, c in frame_counts.items() if 4 <= n <= 8)
+    pct = 100 * in_range / len(scenes) if scenes else 0
+    print(f"\n  4-8 frames: {in_range} scenes ({pct:.1f}%)")
+
+
+def print_caption_stats(scenes: list):
+    word_counts = [len(s.get("scene_description", "").split()) for s in scenes]
+    if not word_counts:
+        return
+    print(f"\nCaption length (words):  mean={np.mean(word_counts):.1f}  median={np.median(word_counts):.1f}  min={min(word_counts)}  max={max(word_counts)}")
+
 
 def consecutive_pairs(scenes: list, dset_dir: str) -> list[tuple[str, str, str]]:
     pairs = []
@@ -55,19 +67,26 @@ def consecutive_pairs(scenes: list, dset_dir: str) -> list[tuple[str, str, str]]
     return pairs
 
 
-def similarity_pair(path_a: str, path_b: str) -> float:
-    a = np.array(Image.open(path_a).convert("L"))
-    b = np.array(Image.open(path_b).convert("L"))
-    return structural_similarity(a, b, data_range=255)
+def _load_tensor(path: str) -> torch.Tensor:
+    img = Image.open(path).convert("RGB")
+    t = torch.tensor(np.array(img)).permute(2, 0, 1).float() / 127.5 - 1.0
+    return t.unsqueeze(0)
+
+
+def similarity_pair(path_a: str, path_b: str, loss_fn) -> float:
+    return loss_fn(_load_tensor(path_a), _load_tensor(path_b)).item()
 
 
 def compute_similarity_scores(pairs: list[tuple[str, str, str]]) -> list[float]:
-    return [similarity_pair(a, b) for a, b, _ in tqdm(pairs, desc="Computing SSIM")]
+    loss_fn = lpips.LPIPS(net="alex", verbose=False)
+    return [similarity_pair(a, b, loss_fn) for a, b, _ in tqdm(pairs, desc="Computing LPIPS")]
 
 
 def print_similarity_histogram(scores: list[float], bins: int = 20):
-    counts, edges = np.histogram(scores, bins=bins, range=(0.0, 1.0))
-    print(f"\nSSIM of consecutive frames ({len(scores)} pairs):")
+    max_val = max(scores) if scores else 1.0
+    upper = round(max_val + 0.05, 1)
+    counts, edges = np.histogram(scores, bins=bins, range=(0.0, upper))
+    print(f"\nLPIPS of consecutive frames ({len(scores)} pairs, lower = more similar):")
     for i, count in enumerate(counts):
         lo, hi = edges[i], edges[i + 1]
         bar = "#" * (count // 10)
@@ -77,22 +96,29 @@ def print_similarity_histogram(scores: list[float], bins: int = 20):
 
 def print_pairs_in_range(pairs: list[tuple[str, str, str]], scores: list[float], lo: float, hi: float):
     matches = [(s, a, b, sid) for (a, b, sid), s in zip(pairs, scores) if lo <= s < hi]
-    print(f"\nPairs with similarity {lo:.2f}-{hi:.2f} ({len(matches)}):")
-    for score, a, b, scene_id in sorted(matches, reverse=True):
+    print(f"\nPairs with LPIPS distance {lo:.2f}-{hi:.2f} ({len(matches)}):")
+    for score, a, b, scene_id in sorted(matches):
         print(f"  {score:.3f}  {scene_id}  {os.path.basename(a)}  ->  {os.path.basename(b)}")
 
 
 def main():
     if len(sys.argv) < 2 or sys.argv[1] not in DATASETS:
-        print(f"Usage: describe_dataset.py [{' | '.join(DATASETS)}]")
+        print(f"Usage: describe_dataset.py [{' | '.join(DATASETS)}] [--json <file.json>]")
         sys.exit(1)
 
     name = sys.argv[1]
+    json_file = "scenes.json"
+    if "--json" in sys.argv:
+        idx = sys.argv.index("--json")
+        if idx + 1 < len(sys.argv):
+            json_file = sys.argv[idx + 1]
+
     dset_dir = dataset_dir(name)
-    scenes = load_scenes(dset_dir)
+    scenes = load_scenes(dset_dir, json_file)
 
     print_overview(scenes, name)
     print_frame_histogram(scenes)
+    print_caption_stats(scenes)
 
     pairs = consecutive_pairs(scenes, dset_dir)
     if not pairs:
@@ -101,7 +127,7 @@ def main():
 
     scores = compute_similarity_scores(pairs)
     print_similarity_histogram(scores)
-    print_pairs_in_range(pairs, scores, lo=0.98, hi=1.0)
+    print_pairs_in_range(pairs, scores, lo=0.0, hi=0.05)
 
 
 if __name__ == "__main__":
