@@ -1,0 +1,14 @@
+model: molmo-7b
+dataset: mtl-aqa
+seed: 42
+script: swap_localize
+batch_size: 64
+
+slurm:
+  qos: acc_ehpc
+  time: "01:00:00"
+  gpus: 1
+  cpus_per_gpu: 20
+
+system_prompt: >
+  You are given a sequence of images showing a scene unfolding over time. Exactly two consecutive frames have been swapped. Reply with only the two frame numbers that are out of order, separated by a comma. For example: 3,4 means frames 3 and 4 were swapped. Use 1-based indexing (1 for the first frame).

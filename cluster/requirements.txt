@@ -1,0 +1,20 @@
+# vllm 0.11.0 pulls torch 2.8.0 with CUDA 12.8 deps. The cluster's kernel driver
+# only natively supports CUDA 12.2, so run.sbatch loads nvidia-hpc-sdk/25.3's
+# forward-compat libcuda (570.124.06) at runtime to bridge the gap.
+# vllm 0.11 adds Qwen3-VL support.
+vllm==0.11.0
+# vllm 0.11 uses tokenizer.all_special_tokens_extended which was removed in
+# transformers 5.x. Keep on the 4.x line until vllm catches up.
+transformers>=4.55.2,<5
+accelerate
+pillow
+numpy
+pyyaml
+huggingface_hub
+# Build tools needed offline: pyairports is sdist-only and pip needs these to build it.
+# pathlib is a no-op on Python 3 (stdlib) but pyairports' setup.py declares it as a build dep.
+setuptools
+wheel
+pathlib
+tensorflow-cpu
+matplotlib
