@@ -10,12 +10,13 @@ def main(cfg: dict) -> None:
     base = Dataset(cfg["dataset"]["path"], cfg["dataset"]["seq_len_min"], cfg["dataset"]["seq_len_max"], seed=cfg["seed"], manifest=cfg["dataset"].get("manifest"))
     scenarios = SwapDataset(base).sample_binary(cfg.get("n"))
     exp_name = f"swap_detect_{cfg['dataset']['name']}_{cfg['model']['name']}"
-    results = Results(exp_name, cfg["model"]["name"], total=len(scenarios))
+    results = Results(exp_name, cfg["model"]["name"], total=len(scenarios), out_dir=cfg.get("out_dir", "outputs"))
 
+    include_scene_desc = cfg.get("include_scene_descriptions", True)
     batch_size = cfg.get("batch_size", len(scenarios))
     for i in range(0, len(scenarios), batch_size):
         batch = scenarios[i:i + batch_size]
-        requests = [(s.frames, cfg["system_prompt"], s.scene_description) for s in batch]
+        requests = [(s.frames, cfg["system_prompt"], s.scene_description if include_scene_desc else None) for s in batch]
         answers = model.ask_batch(requests, pattern=r"yes|no")
         for s, answer in zip(batch, answers):
             results.log(s.name, len(s.frames), s.anomaly, answer)
