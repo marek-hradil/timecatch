@@ -6,10 +6,12 @@ from results import Results
 
 
 def main(cfg: dict) -> None:
-    model = Model(cfg["model"]["path"], tensor_parallel_size=cfg["model"].get("tensor_parallel_size", 1), video_mode=cfg["model"].get("video_mode", False), max_model_len=cfg["model"].get("max_model_len"), max_image_size=cfg["model"].get("max_image_size"))
+    model = Model(cfg["model"]["path"], tensor_parallel_size=cfg["model"].get("tensor_parallel_size", 1), video_mode=cfg["model"].get("video_mode", False), max_model_len=cfg["model"].get("max_model_len"), max_image_size=cfg["model"].get("max_image_size"), thinking=cfg["model"].get("thinking", False))
     base = Dataset(cfg["dataset"]["path"], cfg["dataset"]["seq_len_min"], cfg["dataset"]["seq_len_max"], seed=cfg["seed"], manifest=cfg["dataset"].get("manifest"))
     scenarios = SwapDataset(base).sample_binary(cfg.get("n"))
     exp_name = f"swap_detect_{cfg['dataset']['name']}_{cfg['model']['name']}"
+    if cfg.get("exp_suffix"):
+        exp_name += f"_{cfg['exp_suffix']}"
     results = Results(exp_name, cfg["model"]["name"], total=len(scenarios), out_dir=cfg.get("out_dir", "outputs"))
 
     include_scene_desc = cfg.get("include_scene_descriptions", True)

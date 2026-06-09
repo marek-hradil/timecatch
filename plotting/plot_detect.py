@@ -18,7 +18,7 @@ import matplotlib.pyplot as plt
 
 def parse_filename(path: str) -> tuple[str, str]:
     base = os.path.basename(path).removesuffix(".csv")
-    m = re.match(r"^(corrupt_detect|swap_detect)_(.+)$", base)
+    m = re.match(r"^(corrupt_detect|swap_detect|shuffle_detect)_(.+)$", base)
     if not m:
         raise ValueError(f"Can't parse task/dataset from filename: {base}")
     return m.group(1), m.group(2)

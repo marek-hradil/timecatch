@@ -1,8 +1,24 @@
+import re
+
 import numpy as np
 from PIL import Image as PILImage
 from transformers import AutoProcessor
 from vllm import LLM, SamplingParams
 from vllm.sampling_params import StructuredOutputsParams
+
+
+def _strip_think(text: str) -> str:
+    """Remove <think>...</think> block — no-op for non-thinking models."""
+    return re.sub(r"<think>[\s\S]*?</think>\s*", "", text, flags=re.IGNORECASE).strip()
+
+
+def _extract_yesno(text: str) -> str:
+    """Extract the last yes/no from text — for thinking models that reason before answering."""
+    text = _strip_think(text)
+    matches = list(re.finditer(r'\b(yes|no)\b', text, re.IGNORECASE))
+    if matches:
+        return matches[-1].group(1).lower()
+    return text.strip()
 
 
 class Model:
@@ -14,9 +30,12 @@ class Model:
         video_mode: bool = False,
         max_model_len: int | None = None,
         max_image_size: int | None = None,
+        thinking: bool = False,
     ):
         self._video_mode = video_mode
         self._max_image_size = max_image_size
+        # Thinking models must generate freely — constrained sampling blocks <think>.
+        self._thinking = thinking
         mm_limits = {"image": max_images, "video": 0}
         if video_mode:
             mm_limits = {"image": 0, "video": 1}
@@ -38,7 +57,14 @@ class Model:
             # and refuse to load without this flag.
             trust_remote_code=True,
         )
-        self.processor = AutoProcessor.from_pretrained(model_id, trust_remote_code=True)
+        try:
+            self.processor = AutoProcessor.from_pretrained(model_id, trust_remote_code=True)
+        except AttributeError:
+            # InternVL3.5 uses Qwen2TokenizerFast which lacks start_image_token
+            # expected by InternVLProcessor. The tokenizer alone is sufficient since
+            # vLLM handles image processing internally.
+            from transformers import AutoTokenizer
+            self.processor = AutoTokenizer.from_pretrained(model_id, trust_remote_code=True)
         self._model_id_lower = model_id.lower()
 
     def _messages(self, images: list[PILImage.Image], system_prompt: str, user_text: str | None = None) -> list[dict]:
@@ -132,10 +158,15 @@ class Model:
         return self.ask_batch([(images, system_prompt, user_text)], pattern=pattern)[0]
 
     def ask_batch(self, requests: list[tuple[list[PILImage.Image], str, str | None]], pattern: str | None = None) -> list[str]:
-        sampling_params = (
-            SamplingParams(structured_outputs=StructuredOutputsParams(regex=pattern))
-            if pattern else None
-        )
+        # Thinking models generate freely — constrained sampling blocks reasoning.
+        # Use a high max_tokens budget so the model can finish its chain-of-thought.
+        if self._thinking:
+            sampling_params = SamplingParams(max_tokens=4096)
+        elif pattern:
+            sampling_params = SamplingParams(structured_outputs=StructuredOutputsParams(regex=pattern))
+        else:
+            sampling_params = None
         inputs = [self._prompt(self._messages(imgs, sp, user_text), imgs) for imgs, sp, user_text in requests]
         outputs = self.llm.generate(inputs, sampling_params=sampling_params)
-        return [out.outputs[0].text for out in outputs]
+        postprocess = _extract_yesno if self._thinking else _strip_think
+        return [postprocess(out.outputs[0].text) for out in outputs]

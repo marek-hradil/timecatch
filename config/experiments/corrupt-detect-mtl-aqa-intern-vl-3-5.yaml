@@ -1,0 +1,14 @@
+model: intern-vl-3-5
+dataset: mtl-aqa
+seed: 42
+script: corrupt_detect
+batch_size: 64
+
+slurm:
+  qos: acc_ehpc
+  time: "01:00:00"
+  gpus: 1
+  cpus_per_gpu: 20
+
+system_prompt: >
+  You are given a sequence of images showing a scene unfolding over time. One frame may have been replaced with random noise. Reply with only 'yes' if you see a corrupted frame, or 'no' if all frames look normal.

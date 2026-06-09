@@ -1,0 +1,17 @@
+model: qwen3-vl-8b
+dataset: craft
+seed: 42
+n: 200
+script: swap_detect
+batch_size: 64
+
+slurm:
+  qos: acc_ehpc
+  time: "00:30:00"
+  gpus: 1
+  cpus_per_gpu: 20
+
+system_prompt: >
+  You are given a sequence of images. Go through them one by one from the first to the last. For each consecutive pair, ask yourself: could this transition happen naturally — does the second image physically follow from the first? If any single transition looks reversed or impossible, two adjacent frames have been swapped. Reply with only 'yes' if you find such a transition, or 'no' if every step forward in the sequence looks natural.
+
+exp_suffix: prompt-e

@@ -152,6 +152,31 @@ class SwapDataset:
         return result
 
 
+class ShuffleDataset:
+    def __init__(self, dataset: Dataset):
+        self._dataset = dataset
+        self._seed = dataset.seed
+
+    def _derange(self, frames: list, rng: random.Random) -> list:
+        indices = list(range(len(frames)))
+        while True:
+            rng.shuffle(indices)
+            if all(i != j for i, j in enumerate(indices)):
+                break
+        return [frames[i] for i in indices]
+
+    def sample_binary(self, n: int | None = None) -> list[BinaryScenario]:
+        rng = random.Random(self._seed)
+        result = []
+        for s in self._dataset.sample(n):
+            if rng.random() < 0.5:
+                frames = self._derange(s.frames, rng)
+                result.append(BinaryScenario(name=s.name, frames=frames, anomaly=True, scene_description=s.scene_description))
+            else:
+                result.append(BinaryScenario(name=s.name, frames=list(s.frames), anomaly=False, scene_description=s.scene_description))
+        return result
+
+
 class CorruptDataset:
     def __init__(self, dataset: Dataset):
         self._dataset = dataset

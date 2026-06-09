@@ -1,0 +1,17 @@
+model: qwen3-vl-8b
+dataset: clevrer
+seed: 42
+n: 200
+script: swap_detect
+batch_size: 64
+
+slurm:
+  qos: acc_ehpc
+  time: "00:30:00"
+  gpus: 1
+  cpus_per_gpu: 20
+
+system_prompt: >
+  Look at these images in order. Have any two neighboring images been swapped? Reply with only 'yes' or 'no'.
+
+exp_suffix: prompt-d

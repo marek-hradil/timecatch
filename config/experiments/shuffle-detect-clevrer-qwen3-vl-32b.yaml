@@ -1,0 +1,14 @@
+model: qwen3-vl-32b
+dataset: clevrer
+seed: 42
+script: shuffle_detect
+batch_size: 64
+
+slurm:
+  qos: acc_ehpc
+  time: "03:00:00"
+  gpus: 2
+  cpus_per_gpu: 20
+
+system_prompt: >
+  You are given a sequence of images showing a scene unfolding over time. The frames may have been randomly shuffled into an unnatural order. Reply with only 'yes' if the sequence appears shuffled, or 'no' if it appears to be in the correct temporal order.
