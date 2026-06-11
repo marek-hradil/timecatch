@@ -4,7 +4,7 @@ import matplotlib.pyplot as plt
 import matplotlib.ticker as ticker
 import numpy as np
 
-BASE = os.path.dirname(__file__)
+BASE = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 DATASETS = ["clevrer", "craft", "drive-lm", "mtl-aqa"]
 DATASET_LABELS = ["CLEVRER", "CRAFT", "Drive-LM", "MTL-AQA"]
 
@@ -37,7 +37,7 @@ def accuracy(rows, scenarios=None):
 
 
 def load_baseline_scenarios(ds):
-    path = os.path.join(BASE, "results-prompt-ablation",
+    path = os.path.join(BASE, "results", "prompt-ablation",
                         f"swap_detect_{ds}_qwen3-vl-8b_prompt-a.csv")
     rows = load_csv(path)
     return set(rows.keys()), rows
@@ -45,7 +45,7 @@ def load_baseline_scenarios(ds):
 
 PROMPT_PATHS = {
     name: {
-        ds: os.path.join(BASE, "results-prompt-ablation",
+        ds: os.path.join(BASE, "results", "prompt-ablation",
                          f"swap_detect_{ds}_qwen3-vl-8b_prompt-{ch}.csv")
         for ds in DATASETS
     }
@@ -56,12 +56,12 @@ PROMPT_PATHS = {
 SIGNAL_CONDITIONS = {
     "No scene desc": {
         "color": "#e07b39", "marker": "D", "size": 80, "zorder": 5,
-        "paths": {ds: os.path.join(BASE, "results-qwen3-vl-8b", "no-scene-desc",
+        "paths": {ds: os.path.join(BASE, "results", "qwen3-vl-8b", "no-scene-desc",
                                    f"swap_detect_{ds}.csv") for ds in DATASETS},
     },
     "Thinking": {
         "color": "#3a9e64", "marker": "s", "size": 80, "zorder": 5,
-        "paths": {ds: os.path.join(BASE, "results-thinking-ablation",
+        "paths": {ds: os.path.join(BASE, "results", "thinking-ablation",
                                    f"swap_detect_{ds}_qwen3-vl-8b-thinking_thinking.csv")
                   for ds in DATASETS},
     },

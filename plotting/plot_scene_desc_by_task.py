@@ -3,8 +3,8 @@
 For each task, shows accuracy averaged over all datasets and models,
 with individual model averages overlaid as scatter points.
 
-Auto-discovers model result pairs (results-<model>/ + results-<model>/no-scene-desc/)
-in the current directory.
+Auto-discovers model result pairs (results/<model>/ + results/<model>/no-scene-desc/)
+in the results/ directory.
 
 Usage:
     python plot_scene_desc_by_task.py
@@ -80,10 +80,7 @@ def discover_models(root: str) -> list[tuple[str, str, str]]:
         without_dir = os.path.join(root, name, "no-scene-desc")
         if not os.path.isdir(with_dir) or not os.path.isdir(without_dir):
             continue
-        if not name.startswith("results-"):
-            continue
-        model = name.removeprefix("results-")
-        pairs.append((model, with_dir, without_dir))
+        pairs.append((name, with_dir, without_dir))
     return pairs
 
 
@@ -91,7 +88,7 @@ def collect(root: str) -> dict:
     """Returns data[task][model] = {"with": [acc, ...], "without": [acc, ...]}"""
     models = discover_models(root)
     if not models:
-        raise RuntimeError(f"No results-<model>/no-scene-desc/ pairs found in {root}")
+        raise RuntimeError(f"No results/<model>/no-scene-desc/ pairs found in {root}")
 
     data: dict = {t: defaultdict(lambda: {"with": [], "without": []}) for t in TASKS}
 
@@ -118,8 +115,7 @@ def collect(root: str) -> dict:
 
 
 def main(out_path: str) -> None:
-    root = os.path.dirname(os.path.abspath(out_path)) if os.path.dirname(out_path) else "."
-    root = "."
+    root = os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), "results")
     data = collect(root)
 
     fig, axes = plt.subplots(1, 4, figsize=(16, 5.5), sharey=False)

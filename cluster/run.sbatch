@@ -34,4 +34,4 @@ export TRANSFORMERS_OFFLINE=1
 export HF_HUB_OFFLINE=1
 export SRUN_CPUS_PER_TASK="${SLURM_CPUS_PER_TASK:-1}"
 
-srun python "${SCRIPT}.py" "$EXP"
+srun python "scripts/${SCRIPT}.py" "$EXP"

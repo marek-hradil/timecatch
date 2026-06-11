@@ -9,8 +9,8 @@ on raw exact-match. This plot uses **1-based-shifted** exact match
 (ground_truth + 1) so the metric reflects the model's actual behaviour.
 
 Usage:
-  python plot_localize.py results-qwen2-5-vl-7b/corrupt_localize_*.csv
-  python plot_localize.py results-qwen2-5-vl-7b/swap_localize_*.csv
+  python plotting/plot_localize.py results/qwen2-5-vl-7b/corrupt_localize_*.csv
+  python plotting/plot_localize.py results/qwen2-5-vl-7b/swap_localize_*.csv
 """
 import csv
 import os
@@ -133,7 +133,7 @@ def main(paths: list[str], allow_craft_long: bool = False) -> None:
     ax.set_xticklabels([str(l) for l in all_lens])
     ax.set_xlabel("Sequence length (frames)")
     ax.set_ylabel("Exact match accuracy (%, 1-based-shifted)")
-    model_hint = os.path.basename(src_dir).removeprefix("results-")
+    model_hint = os.path.basename(src_dir)
     title = f"{task} — exact match by sequence length × dataset"
     if model_hint and model_hint != src_dir:
         title += f"\n(model: {model_hint}, ground-truth shifted +1 to match 1-based prompt)"

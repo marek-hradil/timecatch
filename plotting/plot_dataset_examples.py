@@ -108,6 +108,6 @@ for group_idx, ((label_a, ds_a), (label_b, ds_b)) in enumerate(GROUPS):
 
     y_cursor = frame_bottom - ROW_GAP
 
-out_path = os.path.join(os.path.dirname(__file__), "..", "dataset_examples.png")
+out_path = os.path.join(os.path.dirname(__file__), "..", "figures", "dataset_examples.png")
 fig.savefig(out_path, dpi=150, bbox_inches='tight')
 print(f"Saved to {out_path}")

@@ -12,12 +12,12 @@ from pathlib import Path
 from scipy import stats
 
 MODELS = [
-    ("Qwen2.5-VL-7B",  "results-qwen2-5-vl-7b"),
-    ("Qwen3-VL-8B",    "results-qwen3-vl-8b"),
-    ("InternVL3.5-8B", "results-intern-vl-3-5"),
-    ("Gemma-4-E4B",    "results-gemma-4-e4b"),
-    ("InternVL3-8B",   "results-intern-vl-3"),
-    ("Molmo-7B",       "results-molmo-7b"),
+    ("Qwen2.5-VL-7B",  "results/qwen2-5-vl-7b"),
+    ("Qwen3-VL-8B",    "results/qwen3-vl-8b"),
+    ("InternVL3.5-8B", "results/intern-vl-3-5"),
+    ("Gemma-4-E4B",    "results/gemma-4-e4b"),
+    ("InternVL3-8B",   "results/intern-vl-3"),
+    ("Molmo-7B",       "results/molmo-7b"),
 ]
 DATASETS    = ["clevrer", "craft", "drive-lm", "mtl-aqa"]
 DS_LABELS   = {"clevrer": "CL", "craft": "CR",
@@ -97,7 +97,7 @@ def main() -> None:
     print(r"    \midrule")
     mean_cells = []
     for ds in DATASETS:
-        path = root / "results-qwen3-vl-8b" / f"swap_localize_{ds}.csv"
+        path = root / "results" / "qwen3-vl-8b" / f"swap_localize_{ds}.csv"
         vals = []
         if path.exists():
             with open(path, newline="") as f:

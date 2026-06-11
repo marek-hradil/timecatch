@@ -5,8 +5,8 @@ and writes it as `seq_lpips`. All pairs for a scene are batched into a
 single forward pass for speed.
 
 Usage:
-  python scripts/add_seq_lpips.py results-qwen3-vl-8b
-  python scripts/add_seq_lpips.py results-*/
+  python scripts/add_seq_lpips.py results/qwen3-vl-8b
+  python scripts/add_seq_lpips.py results/*/
 """
 import csv
 import itertools
@@ -114,7 +114,7 @@ def main(dirs: list[str]) -> None:
     loss_fn = lpips.LPIPS(net="alex")
     loss_fn.eval()
 
-    result_dirs = [Path(d) for d in dirs] if dirs else sorted(BASE.glob("results-*/"))
+    result_dirs = [Path(d) for d in dirs] if dirs else sorted((BASE / "results").glob("*/"))
     for d in result_dirs:
         if d.is_dir():
             process(d, loss_fn)

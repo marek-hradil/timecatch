@@ -9,8 +9,8 @@ A fourth panel shows the distribution of predicted pair gaps |i - j|
 (correct answers always have gap = 1).
 
 Usage:
-    python plot_heatmap.py results-qwen3-vl-8b/corrupt_localize_*.csv
-    python plot_heatmap.py results-qwen3-vl-8b/swap_localize_*.csv
+    python plotting/plot_heatmap.py results/qwen3-vl-8b/corrupt_localize_*.csv
+    python plotting/plot_heatmap.py results/qwen3-vl-8b/swap_localize_*.csv
 """
 import csv
 import os

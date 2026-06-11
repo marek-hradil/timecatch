@@ -20,11 +20,11 @@ from colors import CHANCE_COLOR, MODEL_PALETTE
 BASE = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
 MODELS = [
-    ("Qwen2.5-VL-7B",  "results-qwen2-5-vl-7b"),
-    ("Qwen3-VL-8B",    "results-qwen3-vl-8b"),
-    ("InternVL3.5-8B", "results-intern-vl-3-5"),
-    ("Gemma-4-E4B",    "results-gemma-4-e4b"),
-    ("Molmo-7B",       "results-molmo-7b"),
+    ("Qwen2.5-VL-7B",  "results/qwen2-5-vl-7b"),
+    ("Qwen3-VL-8B",    "results/qwen3-vl-8b"),
+    ("InternVL3.5-8B", "results/intern-vl-3-5"),
+    ("Gemma-4-E4B",    "results/gemma-4-e4b"),
+    ("Molmo-7B",       "results/molmo-7b"),
 ]
 DATASETS = ["clevrer", "craft", "drive-lm", "mtl-aqa"]
 
@@ -106,7 +106,7 @@ def main() -> None:
     ax.legend(fontsize=9)
 
     plt.tight_layout()
-    out_path = os.path.join(BASE, "lpips_vs_swap_detect.png")
+    out_path = os.path.join(BASE, "figures", "lpips_vs_swap_detect.png")
     plt.savefig(out_path, dpi=150, bbox_inches="tight")
     plt.close(fig)
     print(f"→ {out_path}")

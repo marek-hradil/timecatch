@@ -60,7 +60,7 @@ MODEL_ORDER = [
     "molmo-7b", "intern-vl-3", "intern-vl",
     "qwen3-vl-2b", "qwen3-vl-4b", "qwen3-vl-32b",
 ]
-EXCLUDE = {"qwen3-vl-8b-thinking", "qwen3-vl-8b-video"}
+EXCLUDE = {"qwen3-vl-8b-thinking", "qwen3-vl-8b-video", "no-scene-desc", "prompt-ablation", "thinking-ablation"}
 
 # ---------------------------------------------------------------------------
 # Accuracy helpers  (identical logic to print_main_table.py)
@@ -158,7 +158,7 @@ def compute_chance(root: Path) -> dict[CellKey, float]:
     """Compute per-dataset random-chance baselines from actual seq_len distributions."""
     # Use the first available results dir to get seq_len distribution per dataset
     ref_dir = next(
-        (d for d in sorted(root.iterdir()) if d.is_dir() and d.name.startswith("results-")),
+        (d for d in sorted((root / "results").iterdir()) if d.is_dir()),
         None,
     )
     chance: dict[CellKey, float] = {}
@@ -197,15 +197,15 @@ def compute_chance(root: Path) -> dict[CellKey, float]:
 
 def discover_models(root: Path) -> list[str]:
     return [
-        d.name.removeprefix("results-")
-        for d in sorted(root.iterdir())
-        if d.is_dir() and d.name.startswith("results-")
+        d.name
+        for d in sorted((root / "results").iterdir())
+        if d.is_dir()
     ]
 
 
 
 def compute_cells(root: Path, model: str) -> dict[CellKey, float | None]:
-    res_dir = root / f"results-{model}"
+    res_dir = root / "results" / model
     cells: dict[CellKey, float | None] = {}
     for task in TASKS:
         for ds in DATASETS:
@@ -360,7 +360,7 @@ def main() -> None:
     root   = Path(args.root).resolve()
     models = [m for m in discover_models(root) if m not in EXCLUDE]
     if not models:
-        sys.exit("No results-* directories found.")
+        sys.exit("No model directories found in results/.")
 
     order_idx = {m: i for i, m in enumerate(MODEL_ORDER)}
     models.sort(key=lambda m: (order_idx.get(m, 999), m))

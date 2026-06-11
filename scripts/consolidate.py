@@ -1,10 +1,10 @@
-"""Consolidate outputs/ timestamped dirs into flat results-{model}/ CSV files.
+"""Consolidate outputs/ timestamped dirs into flat results/{model}/ CSV files.
 
 For each (experiment, dataset, model) triple, picks the latest outputs/ run
-and copies it to results-{model}/{experiment}_{dataset}.csv.
+and copies it to results/{model}/{experiment}_{dataset}.csv.
 
 Usage:
-    python consolidate.py [--outputs-dir outputs] [--results-dir .]
+    python scripts/consolidate.py [--outputs-dir outputs] [--results-dir results]
 """
 import argparse
 import re
@@ -46,7 +46,7 @@ def parse_dir_name(name: str):
 def main():
     ap = argparse.ArgumentParser()
     ap.add_argument("--outputs-dir", default="outputs")
-    ap.add_argument("--results-dir", default=".")
+    ap.add_argument("--results-dir", default="results")
     args = ap.parse_args()
 
     outputs = Path(args.outputs_dir)
@@ -77,7 +77,7 @@ def main():
         if lines <= 2:
             continue
 
-        dest_dir = results_root / f"results-{model}"
+        dest_dir = results_root / model
         dest_dir.mkdir(exist_ok=True)
         dest = dest_dir / f"{experiment}.csv"
 

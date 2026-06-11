@@ -5,8 +5,8 @@ swap_detect). craft-long is auto-skipped — it has different sequence lengths
 than the rest, so mixing it in clutters the x-axis.
 
 Usage:
-  python plot_detect.py results-qwen2-5-vl-7b/corrupt_detect_*.csv
-  python plot_detect.py results-qwen2-5-vl-7b/swap_detect_*.csv
+  python plotting/plot_detect.py results/qwen2-5-vl-7b/corrupt_detect_*.csv
+  python plotting/plot_detect.py results/qwen2-5-vl-7b/swap_detect_*.csv
 """
 import csv
 import os
@@ -100,7 +100,7 @@ def main(paths: list[str]) -> None:
     ax.set_xticklabels([str(l) for l in all_lens])
     ax.set_xlabel("Sequence length (frames)")
     ax.set_ylabel("Accuracy (%)")
-    model_hint = os.path.basename(src_dir).removeprefix("results-")
+    model_hint = os.path.basename(src_dir)
     title = f"{task} — accuracy by sequence length × dataset"
     if model_hint and model_hint != src_dir:
         title += f"\n(model: {model_hint})"

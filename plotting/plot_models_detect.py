@@ -1,11 +1,11 @@
 """Plot binary-detection accuracy for ONE task on ONE dataset, across multiple models.
 
-Pass CSVs from different `results-<model>/` directories that share the same
+Pass CSVs from different `results/<model>/` directories that share the same
 task and dataset. The plot puts sequence length on x-axis and groups bars by model.
 
 Usage:
-  python plot_models_detect.py results-*/corrupt_detect_craft-long.csv
-  python plot_models_detect.py results-*/swap_detect_craft-long.csv
+  python plotting/plot_models_detect.py results/*/corrupt_detect_craft-long.csv
+  python plotting/plot_models_detect.py results/*/swap_detect_craft-long.csv
 """
 import csv
 import os
@@ -17,9 +17,9 @@ from colors import CHANCE_COLOR, MODEL_PALETTE
 
 
 def parse_path(path: str) -> tuple[str, str, str]:
-    """Return (task, dataset, model_key) for a path like 'results-<model>/<task>_<dataset>.csv'."""
+    """Return (task, dataset, model_key) for a path like 'results/<model>/<task>_<dataset>.csv'."""
     parent = os.path.basename(os.path.dirname(os.path.abspath(path)))
-    model = parent.removeprefix("results-")
+    model = parent
     base = os.path.basename(path).removesuffix(".csv")
     m = re.match(r"^(corrupt_detect|swap_detect)_(.+)$", base)
     if not m:

@@ -4,8 +4,8 @@ Merges craft (seq_len 4–8) and craft-long (8–16) onto one x-axis.
 A dotted vertical line marks the craft / craft-long boundary at seq_len 8.5.
 
 Usage:
-  python plotting/plot_craft_by_length.py                        # auto-discover results-*
-  python plotting/plot_craft_by_length.py results-qwen3-vl-8b results-intern-vl-3-5
+  python plotting/plot_craft_by_length.py                        # auto-discover results/*
+  python plotting/plot_craft_by_length.py results/qwen3-vl-8b results/intern-vl-3-5
 """
 import csv
 import os
@@ -108,7 +108,7 @@ def main(result_dirs: list[str]) -> None:
     all_lens_set: set[int] = set()
 
     for d in result_dirs:
-        model_key = os.path.basename(d).removeprefix("results-")
+        model_key = os.path.basename(d)
         label = MODEL_LABELS.get(model_key, model_key)
         has_data = False
         for task in TASKS:
@@ -182,33 +182,33 @@ def main(result_dirs: list[str]) -> None:
                bbox_to_anchor=(0.5, 0.05))
     fig.tight_layout(rect=[0, 0.12, 1, 1])
 
-    out = os.path.join(BASE, "craft_combined_by_length.png")
+    out = os.path.join(BASE, "figures", "craft_combined_by_length.png")
     fig.savefig(out, dpi=150, bbox_inches="tight")
     plt.close(fig)
     print(f"\n→ {out}")
 
 
 DEFAULT_MODELS = {
-    "results-gemma-4-e4b",
-    "results-intern-vl-3",
-    "results-intern-vl-3-5",
-
-    "results-qwen3-vl-8b",
-    "results-qwen2-5-vl-7b",
+    "gemma-4-e4b",
+    "intern-vl-3",
+    "intern-vl-3-5",
+    "qwen3-vl-8b",
+    "qwen2-5-vl-7b",
 }
 
 
 def _auto_discover() -> list[str]:
+    results_dir = os.path.join(BASE, "results")
     return sorted(
-        os.path.join(BASE, e)
-        for e in os.listdir(BASE)
-        if e in DEFAULT_MODELS and os.path.isdir(os.path.join(BASE, e))
+        os.path.join(results_dir, e)
+        for e in os.listdir(results_dir)
+        if e in DEFAULT_MODELS and os.path.isdir(os.path.join(results_dir, e))
     )
 
 
 if __name__ == "__main__":
     if len(sys.argv) > 1:
-        dirs = [os.path.join(BASE, a) if not os.path.isabs(a) else a for a in sys.argv[1:]]
+        dirs = [a if os.path.isabs(a) else os.path.join(BASE, a) for a in sys.argv[1:]]
     else:
         dirs = _auto_discover()
     main(dirs)

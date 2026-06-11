@@ -15,10 +15,10 @@ import numpy as np
 BASE = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
 MODELS = [
-    ("2B", "results-qwen3-vl-2b"),
-    ("4B", "results-qwen3-vl-4b"),
-    ("8B", "results-qwen3-vl-8b"),
-    ("32B", "results-qwen3-vl-32b"),
+    ("2B", "results/qwen3-vl-2b"),
+    ("4B", "results/qwen3-vl-4b"),
+    ("8B", "results/qwen3-vl-8b"),
+    ("32B", "results/qwen3-vl-32b"),
 ]
 DATASETS = ["clevrer", "craft", "drive-lm", "mtl-aqa"]
 TASKS = ["corrupt_detect", "corrupt_localize", "swap_detect", "swap_localize"]
@@ -148,7 +148,7 @@ def main() -> None:
 
     plt.tight_layout()
 
-    out_path = os.path.join(BASE, "qwen3_vl_scaling.png")
+    out_path = os.path.join(BASE, "figures", "qwen3_vl_scaling.png")
     plt.savefig(out_path, dpi=150, bbox_inches="tight")
     plt.close(fig)
     print(f"→ {out_path}")

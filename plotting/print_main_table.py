@@ -1,6 +1,6 @@
 """Print the main results table (LaTeX + plain text) averaged over all datasets.
 
-Discovers all results-<model>/ directories automatically. Averages over the
+Discovers all results/<model>/ directories automatically. Averages over the
 four main datasets (clevrer, craft, drive-lm, mtl-aqa) weighted by sample count.
 
 Usage:
@@ -58,7 +58,7 @@ MODEL_ORDER = [
 ]
 
 # Model keys to exclude from the table (ablations, variants, etc.)
-EXCLUDE = {"qwen3-vl-8b-thinking", "qwen3-vl-8b-video"}
+EXCLUDE = {"qwen3-vl-8b-thinking", "qwen3-vl-8b-video", "no-scene-desc", "prompt-ablation", "thinking-ablation"}
 
 # ---------------------------------------------------------------------------
 # Accuracy helpers (mirrors plot_models_detect.py / plot_models_localize.py)
@@ -124,14 +124,14 @@ def task_accuracy(path: Path, task: str) -> tuple[float, int] | None:
 
 def discover_models(root: Path) -> list[str]:
     models = []
-    for d in sorted(root.iterdir()):
-        if d.is_dir() and d.name.startswith("results-"):
-            models.append(d.name.removeprefix("results-"))
+    for d in sorted((root / "results").iterdir()):
+        if d.is_dir():
+            models.append(d.name)
     return models
 
 
 def compute_averages(root: Path, model: str) -> dict[str, float | None]:
-    res_dir = root / f"results-{model}"
+    res_dir = root / "results" / model
     avgs: dict[str, float | None] = {}
     for task in TASKS:
         total_correct = total_n = 0
@@ -227,7 +227,7 @@ def main() -> None:
     root = Path(args.root).resolve()
     models = [m for m in discover_models(root) if m not in EXCLUDE]
     if not models:
-        sys.exit("No results-* directories found.")
+        sys.exit("No model directories found in results/.")
 
     # Sort by preferred order, then alphabetically for unknowns
     order_idx = {m: i for i, m in enumerate(MODEL_ORDER)}

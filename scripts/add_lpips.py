@@ -10,10 +10,10 @@ CSV in the same results directory.
 
 Usage:
     # patch one results dir
-    python scripts/add_lpips.py results-qwen3-vl-8b
+    python scripts/add_lpips.py results/qwen3-vl-8b
 
     # patch all results dirs
-    python scripts/add_lpips.py results-*/
+    python scripts/add_lpips.py results/*/
 """
 import ast
 import csv
@@ -147,7 +147,7 @@ def main(dirs: list[str]) -> None:
 
     result_dirs = [Path(d) for d in dirs]
     if not result_dirs:
-        result_dirs = sorted(BASE.glob("results-*/"))
+        result_dirs = sorted((BASE / "results").glob("*/"))
 
     for d in result_dirs:
         if d.is_dir():

@@ -6,7 +6,7 @@ pooled across all datasets (craft-long excluded). Saves to the with-desc
 results directory.
 
 Usage:
-    python plot_scene_desc_comparison.py results-qwen2-5-vl-7b results-qwen2-5-vl-7b-no-scene-desc
+    python plotting/plot_scene_desc_comparison.py results/qwen2-5-vl-7b results/qwen2-5-vl-7b/no-scene-desc
 """
 import csv
 import os
@@ -155,7 +155,7 @@ def main(with_dir: str, without_dir: str) -> None:
         if not os.path.isdir(d):
             sys.exit(f"ERROR: directory not found: {d}")
 
-    model = os.path.basename(os.path.abspath(with_dir)).removeprefix("results-")
+    model = os.path.basename(os.path.abspath(with_dir))
 
     present = {
         t for t in TASKS

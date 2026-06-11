@@ -1,8 +1,8 @@
 """Plot localization exact-match accuracy for ONE task on ONE dataset, across multiple models.
 
 Usage:
-  python plot_models_localize.py results-*/corrupt_localize_craft-long.csv
-  python plot_models_localize.py results-*/swap_localize_craft-long.csv
+  python plotting/plot_models_localize.py results/*/corrupt_localize_craft-long.csv
+  python plotting/plot_models_localize.py results/*/swap_localize_craft-long.csv
 """
 import csv
 import os
@@ -19,7 +19,7 @@ _PAIR_RE    = re.compile(r"^(\d+)\s*,\s*(\d+)$")
 
 def parse_path(path: str) -> tuple[str, str, str]:
     parent = os.path.basename(os.path.dirname(os.path.abspath(path)))
-    model = parent.removeprefix("results-")
+    model = parent
     base = os.path.basename(path).removesuffix(".csv")
     m = re.match(r"^(corrupt_localize|swap_localize)_(.+)$", base)
     if not m:

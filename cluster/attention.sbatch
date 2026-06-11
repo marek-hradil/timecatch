@@ -16,7 +16,7 @@ export HF_HUB_OFFLINE=1
 export CC=gcc
 export CXX=g++
 
-srun python analyze_attention.py \
+srun python scripts/analyze_attention.py \
     config/experiments/${ATTN_TASK:-swap}-detect-mtl-aqa-qwen3-vl-8b.yaml \
     scene_14_68 scene_04_66 scene_06_54 scene_02_10 scene_03_51 \
     --task "${ATTN_TASK:-swap}"
