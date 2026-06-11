@@ -11,7 +11,7 @@ export default function DetectView() {
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-gray-50 p-4">
-      <div className="max-w-4xl w-full bg-white rounded-2xl shadow-sm border border-gray-200 overflow-hidden">
+      <div className="w-full bg-white rounded-2xl shadow-sm border border-gray-200 overflow-hidden">
         {/* Header */}
         <div className="bg-indigo-600 px-8 py-4 flex items-center justify-between">
           <h2 className="text-white font-semibold">Are the frames in the correct order?</h2>

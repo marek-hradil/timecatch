@@ -40,7 +40,8 @@ VALID_TASKS = {"detect", "localize"}
 
 SAMPLES_PER_PARTICIPANT: int = int(os.environ.get("SAMPLES_PER_PARTICIPANT", "15"))
 
-DB_PATH = Path(os.environ.get("DB_PATH", str(Path(__file__).parent / "annotations.db")))
+# When set, frame URLs point directly at GCS instead of going through /frames
+GCS_PUBLIC_BASE = os.environ.get("GCS_PUBLIC_BASE", "")
 
 PROLIFIC_COMPLETION_BASE = os.environ.get(
     "PROLIFIC_COMPLETION_BASE",

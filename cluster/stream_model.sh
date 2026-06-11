@@ -21,8 +21,13 @@ MODEL_PATH=$(yq -r '.path' "$MODEL_YAML")
 HF_MODEL_DIR="models--$(echo "$MODEL_PATH" | sed 's|/|--|g')"
 LOCAL_HF_CACHE="cluster/hf_cache"
 
-# 1. Generate 20 experiment YAMLs for this model, reusing the system prompts from the qwen2-5-vl-7b set.
-echo "[1/5] generating 20 YAMLs for $MODEL_KEY"
+# Allow callers to override the dataset list:  DATASETS="craft clevrer" ./cluster/stream_model.sh <model>
+# Default: all 5 datasets (the original behaviour).
+IFS=' ' read -r -a DATASET_LIST <<< "${DATASETS:-clevrer craft craft-long drive-lm mtl-aqa}"
+N_JOBS=$(( ${#DATASET_LIST[@]} * 4 ))
+
+# 1. Generate experiment YAMLs for this model, reusing the system prompts from the base set.
+echo "[1/5] generating ${N_JOBS} YAMLs for $MODEL_KEY (datasets: ${DATASET_LIST[*]})"
 DETECT_PROMPT=$(yq -r '.system_prompt' config/experiments/corrupt-detect-mtl-aqa.yaml)
 CLOC_PROMPT=$(yq -r '.system_prompt' config/experiments/corrupt-localize-mtl-aqa.yaml)
 SDET_PROMPT=$(yq -r '.system_prompt' config/experiments/swap-detect-mtl-aqa.yaml)
@@ -46,7 +51,7 @@ system_prompt: >
   ${prompt}
 YAML
 }
-for ds in clevrer craft craft-long drive-lm mtl-aqa; do
+for ds in "${DATASET_LIST[@]}"; do
   generate corrupt-detect    corrupt_detect    "$DETECT_PROMPT" "$ds"
   generate corrupt-localize  corrupt_localize  "$CLOC_PROMPT"   "$ds"
   generate swap-detect       swap_detect       "$SDET_PROMPT"   "$ds"
@@ -85,12 +90,13 @@ rsync -avz --mkpath --info=progress2 \
   "$LOCAL_HF_CACHE/hub/$HF_MODEL_DIR/" \
   "$CLUSTER_USER@$CLUSTER_TRANSFER_HOST:$HF_CACHE/hub/$HF_MODEL_DIR/"
 
-# 5. Submit 20 jobs + free local space.
-echo "[5/5] submitting 20 jobs"
+# 5. Submit jobs + free local space.
+echo "[5/5] submitting ${N_JOBS} jobs"
+DATASETS_REMOTE="${DATASET_LIST[*]}"
 ssh "$CLUSTER_USER@$CLUSTER_INTERNET_HOST" "
 set -uo pipefail
 cd '$REMOTE_DIR'
-for ds in clevrer craft craft-long drive-lm mtl-aqa; do
+for ds in $DATASETS_REMOTE; do
   for script in corrupt-detect corrupt-localize swap-detect swap-localize; do
     yaml=\"config/experiments/\${script}-\${ds}-${MODEL_KEY}.yaml\"
     jobid=\$(bash cluster/submit.sh \"\$yaml\" 2>&1)

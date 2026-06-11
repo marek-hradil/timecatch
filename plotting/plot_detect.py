@@ -14,6 +14,7 @@ import re
 import sys
 
 import matplotlib.pyplot as plt
+from colors import DATASET, CHANCE_COLOR, MODEL_PALETTE
 
 
 def parse_filename(path: str) -> tuple[str, str]:
@@ -79,22 +80,22 @@ def main(paths: list[str]) -> None:
     # Grouped bars: width per-bar = 0.8 / num_datasets.
     width = 0.8 / max(1, len(datasets))
     x = list(range(len(all_lens)))
-    colors = plt.cm.tab10.colors  # type: ignore[attr-defined]
     fig_w = max(10.0, 1.6 * len(all_lens) * len(datasets) ** 0.5)
     fig, ax = plt.subplots(figsize=(fig_w, 5.5))
 
     for i, ds in enumerate(datasets):
         offset = (i - (len(datasets) - 1) / 2) * width
         ys = [a if a is not None else 0.0 for a in accs[ds]]
+        color = DATASET.get(ds, MODEL_PALETTE[i % len(MODEL_PALETTE)])
         bars = ax.bar([xi + offset for xi in x], ys, width,
-                      label=ds, color=colors[i % len(colors)], edgecolor="white")
+                      label=ds, color=color, edgecolor="white")
         for bar, n, a in zip(bars, counts[ds], accs[ds]):
             if a is None or n == 0:
                 continue
             ax.text(bar.get_x() + bar.get_width() / 2, bar.get_height() + 0.8,
                     f"n={n}", ha="center", va="bottom", fontsize=7)
 
-    ax.axhline(y=50, color="salmon", linestyle="--", linewidth=1, label="chance (50%)")
+    ax.axhline(y=50, color=CHANCE_COLOR, linestyle="--", linewidth=1, label="chance (50%)")
     ax.set_xticks(x)
     ax.set_xticklabels([str(l) for l in all_lens])
     ax.set_xlabel("Sequence length (frames)")

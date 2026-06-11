@@ -14,7 +14,6 @@ from pydantic import BaseModel
 
 from .config import (
     DATASETS_ROOT,
-    DB_PATH,
     VALID_DATASETS,
     VALID_TASKS,
     prolific_completion_url,
@@ -47,7 +46,7 @@ def _load_instructions() -> dict[str, str]:
 
 
 _INSTRUCTIONS = _load_instructions()
-init_db(DB_PATH)
+init_db()
 
 # ── App ───────────────────────────────────────────────────────────────────────
 
@@ -62,6 +61,11 @@ app.add_middleware(
 
 # Serve raw frame images: /frames/{dataset}/scenes/{scene}/{N}.jpg
 app.mount("/frames", StaticFiles(directory=str(DATASETS_ROOT)), name="frames")
+
+# Serve instruction media (screenshots, videos)
+_INTRODUCTIONS_DIR = Path(__file__).parent.parent / "introductions"
+if _INTRODUCTIONS_DIR.exists():
+    app.mount("/introductions", StaticFiles(directory=str(_INTRODUCTIONS_DIR)), name="introductions")
 
 # In production, serve the built React app.
 # Use an explicit SPA fallback route rather than StaticFiles at "/" — mounting
@@ -135,7 +139,7 @@ def create_session(req: SessionRequest) -> SessionResponse:
     _validate_condition(req.dataset, req.task)
 
     seed = pid_to_seed(req.prolific_pid)
-    upsert_participant(DB_PATH, req.prolific_pid, req.dataset, req.task, seed)
+    upsert_participant(req.prolific_pid, req.dataset, req.task, seed)
 
     plan = build_plan(req.prolific_pid, req.dataset, req.task)
     instructions_key = f"{req.dataset}_{req.task}"
@@ -188,7 +192,6 @@ def annotate(req: AnnotateRequest) -> AnnotateResponse:
     sample = plan[req.sample_index]
 
     upsert_annotation(
-        DB_PATH,
         req.prolific_pid,
         req.dataset,
         req.task,
@@ -199,11 +202,11 @@ def annotate(req: AnnotateRequest) -> AnnotateResponse:
         ha,
     )
 
-    annotated = count_annotations(DB_PATH, req.prolific_pid, req.dataset, req.task)
+    annotated = count_annotations(req.prolific_pid, req.dataset, req.task)
     completed = annotated >= n
 
     if completed:
-        mark_completed(DB_PATH, req.prolific_pid, req.dataset, req.task)
+        mark_completed(req.prolific_pid, req.dataset, req.task)
 
     return AnnotateResponse(ok=True, annotated=annotated, total=n, completed=completed)
 

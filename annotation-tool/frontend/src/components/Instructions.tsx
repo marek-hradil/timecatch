@@ -1,5 +1,18 @@
 import ReactMarkdown from 'react-markdown'
+import { useRef, useEffect } from 'react'
 import { useStore } from '../store'
+
+const VIDEO_EXT = /\.(mov|mp4|webm)$/i
+
+function MutedVideo({ src }: { src: string }) {
+  const ref = useRef<HTMLVideoElement>(null)
+  useEffect(() => { if (ref.current) ref.current.muted = true }, [])
+  return (
+    <video ref={ref} controls muted className="w-full rounded-lg my-2">
+      <source src={src} />
+    </video>
+  )
+}
 
 export default function Instructions() {
   const { session, dataset, task, beginAnnotating } = useStore()
@@ -15,8 +28,26 @@ export default function Instructions() {
           <h1 className="text-white text-2xl font-semibold mt-1">Study Instructions</h1>
         </div>
 
-        <div className="px-8 py-6 prose prose-gray max-w-none">
-          <ReactMarkdown>{md}</ReactMarkdown>
+        <div className="px-8 py-6 space-y-3 text-gray-700 text-sm leading-relaxed">
+          <ReactMarkdown
+            components={{
+              h1: ({ children }) => <h1 className="text-xl font-bold text-gray-900 mt-4 mb-1">{children}</h1>,
+              h2: ({ children }) => <h2 className="text-lg font-semibold text-gray-900 mt-4 mb-1">{children}</h2>,
+              h3: ({ children }) => <h3 className="text-base font-semibold text-gray-800 mt-3 mb-1">{children}</h3>,
+              p: ({ children }) => <p className="mb-2">{children}</p>,
+              strong: ({ children }) => <strong className="font-semibold text-gray-900">{children}</strong>,
+              ul: ({ children }) => <ul className="list-disc pl-5 space-y-1">{children}</ul>,
+              ol: ({ children }) => <ol className="list-decimal pl-5 space-y-1">{children}</ol>,
+              img: ({ src, alt }) =>
+                src && VIDEO_EXT.test(src) ? (
+                  <MutedVideo src={src} />
+                ) : (
+                  <img src={src} alt={alt ?? ''} className="w-full rounded-lg my-2" />
+                ),
+            }}
+          >
+            {md}
+          </ReactMarkdown>
         </div>
 
         <div className="px-8 pb-8">

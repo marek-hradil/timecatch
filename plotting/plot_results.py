@@ -2,6 +2,7 @@ import csv
 import sys
 import matplotlib.pyplot as plt
 from collections import defaultdict
+from colors import MODE_A, MODE_B, CHANCE_COLOR
 
 path = sys.argv[1] if len(sys.argv) > 1 else "results.csv"
 with open(path, newline="") as f:
@@ -43,8 +44,8 @@ width = 0.35
 
 fig, ax = plt.subplots(figsize=(10, 5))
 
-bars_s = ax.bar([i - width / 2 for i in x], series_acc, width, label="Series", color="steelblue", edgecolor="white")
-bars_c = ax.bar([i + width / 2 for i in x], composite_acc, width, label="Composite", color="mediumseagreen", edgecolor="white")
+bars_s = ax.bar([i - width / 2 for i in x], series_acc, width, label="Series", color=MODE_A, edgecolor="white")
+bars_c = ax.bar([i + width / 2 for i in x], composite_acc, width, label="Composite", color=MODE_B, edgecolor="white")
 
 for bar, n in zip(bars_s, series_counts):
     ax.text(bar.get_x() + bar.get_width() / 2, bar.get_height() + 1.5,
@@ -53,7 +54,7 @@ for bar, n in zip(bars_c, composite_counts):
     ax.text(bar.get_x() + bar.get_width() / 2, bar.get_height() + 1.5,
             f"n={n}", ha="center", va="bottom", fontsize=8)
 
-ax.axhline(y=50, color="salmon", linestyle="--", linewidth=1, label="chance (50%)")
+ax.axhline(y=50, color=CHANCE_COLOR, linestyle="--", linewidth=1, label="chance (50%)")
 ax.set_xticks(list(x))
 ax.set_xticklabels([str(l) for l in all_lengths])
 ax.set_xlabel("Sequence length")

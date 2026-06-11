@@ -1,11 +1,9 @@
-# vllm 0.11.0 pulls torch 2.8.0 with CUDA 12.8 deps. The cluster's kernel driver
-# only natively supports CUDA 12.2, so run.sbatch loads nvidia-hpc-sdk/25.3's
-# forward-compat libcuda (570.124.06) at runtime to bridge the gap.
-# vllm 0.11 adds Qwen3-VL support.
-vllm==0.11.0
-# vllm 0.11 uses tokenizer.all_special_tokens_extended which was removed in
-# transformers 5.x. Keep on the 4.x line until vllm catches up.
-transformers>=4.55.2,<5
+# vllm 0.19.1: CUDA 12.8 compatible (cluster tops out at 12.9; 0.20+ requires CUDA 13).
+# Gemma4 dummy-input bug worked around via VLLM_USE_V1=0 in run.sbatch.
+# The cluster's kernel driver natively supports CUDA 12.2; run.sbatch loads
+# nvidia-hpc-sdk/25.3's forward-compat libcuda (570.124.06) to bridge to cu128.
+vllm==0.19.1
+transformers>=5.5.0
 accelerate
 pillow
 numpy

@@ -15,6 +15,7 @@ import sys
 from collections import defaultdict
 
 import matplotlib.pyplot as plt
+from colors import ABLATION_A, ABLATION_B, CHANCE_COLOR
 
 _INT_RE     = re.compile(r"^\d+$")
 _PAIR_GT_RE = re.compile(r"^\(\s*(\d+)\s*,\s*(\d+)\s*\)$")
@@ -110,9 +111,9 @@ def plot_task(task: str, with_dir: str, without_dir: str, model: str) -> None:
     without_vals = [without_accs.get(l, 0.0) for l in all_lens]
 
     bars_w = ax.bar([xi - width / 2 for xi in x], with_vals,    width,
-                    label="with scene description",    color="steelblue", edgecolor="white")
+                    label="with scene description",    color=ABLATION_A, edgecolor="white")
     bars_o = ax.bar([xi + width / 2 for xi in x], without_vals, width,
-                    label="without scene description", color="salmon",    edgecolor="white")
+                    label="without scene description", color=ABLATION_B, edgecolor="white")
 
     for bars, ns in ((bars_w, with_ns), (bars_o, without_ns)):
         for bar, sl in zip(bars, all_lens):
@@ -122,7 +123,7 @@ def plot_task(task: str, with_dir: str, without_dir: str, model: str) -> None:
                         f"n={n}", ha="center", va="bottom", fontsize=7)
 
     chance, chance_label = chance_line(task, all_lens)
-    ax.plot(x, chance, color="gray", linestyle="--", linewidth=1,
+    ax.plot(x, chance, color=CHANCE_COLOR, linestyle="--", linewidth=1,
             marker="o", markersize=4, label=chance_label)
 
     ax.set_xticks(x)

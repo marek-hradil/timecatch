@@ -256,7 +256,8 @@ def main():
     frame_label = "corrupted frame" if args.task == "corrupt" else "swapped frame pair"
     plt.suptitle(f"Attention rollout: {task_label} on MTL-AQA  (Qwen3-VL-8B)\n"
                  f"Red border / bar = {frame_label}", fontsize=11)
-    out_path = f"attention_rollout_{args.task}.png"
+    os.makedirs("figures", exist_ok=True)
+    out_path = os.path.join("figures", f"attention_rollout_{args.task}.png")
     plt.savefig(out_path, dpi=120, bbox_inches="tight")
     print(f"\n→ {out_path}")
 

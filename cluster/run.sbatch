@@ -26,6 +26,8 @@ export CC=gcc
 export CXX=g++
 # Allow Molmo's 4096 position embedding limit to be overridden.
 export VLLM_ALLOW_LONG_MAX_MODEL_LEN=1
+# Force the V0 engine: Gemma4's dummy-input generation is broken in vLLM 0.19.1's V1 engine.
+export VLLM_USE_V1=0
 
 export HF_HOME="$HF_CACHE"
 export TRANSFORMERS_OFFLINE=1

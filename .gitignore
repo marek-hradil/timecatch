@@ -22,3 +22,4 @@ cluster/env.sh
 cluster/bin/
 cluster/wheels*/
 cluster/hf_cache/
+annotation-tool/introductions

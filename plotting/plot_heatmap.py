@@ -20,6 +20,7 @@ from collections import Counter
 
 import matplotlib.pyplot as plt
 import numpy as np
+from colors import ABLATION_A, ABLATION_B
 
 INT_RE      = re.compile(r"^\d{1,2}$")
 PAIR_GT_RE  = re.compile(r"^\(\s*(\d+)\s*,\s*(\d+)\s*\)$")
@@ -154,7 +155,7 @@ def plot(rows: list[dict], task: str, n_files: int, out_path: str) -> None:
     fig.colorbar(im, ax=ax1, shrink=0.8)
 
     ax1_r = ax1.inset_axes([1.02, 0, 0.12, 1])
-    ax1_r.barh(range(size), gt_marginal, color="steelblue", alpha=0.7)
+    ax1_r.barh(range(size), gt_marginal, color=ABLATION_A, alpha=0.7)
     ax1_r.set_yticks(range(size))
     ax1_r.set_yticklabels([])
     ax1_r.set_xlabel("GT\ncount", fontsize=8)
@@ -163,7 +164,7 @@ def plot(rows: list[dict], task: str, n_files: int, out_path: str) -> None:
     # Panel 3: signed error histogram
     ax2 = fig.add_subplot(1, n_cols, 3)
     bars = ax2.bar(e_range, e_vals, color=[
-        "salmon" if e != 0 else "steelblue" for e in e_range
+        ABLATION_B if e != 0 else ABLATION_A for e in e_range
     ], edgecolor="white")
     ax2.axvline(0, color="black", linewidth=1.2, linestyle="--")
     ax2.set_xlabel("Predicted − ground truth  (0 = correct)")
@@ -190,7 +191,7 @@ def plot(rows: list[dict], task: str, n_files: int, out_path: str) -> None:
         oob_gap = sum(gap_counts.get(g, 0) for g in range(GAP_CAP + 1, max_gap + 1))
 
         ax3 = fig.add_subplot(1, n_cols, 4)
-        bar_colors = ["steelblue" if g == 1 else "salmon" for g in g_range_capped]
+        bar_colors = [ABLATION_A if g == 1 else ABLATION_B for g in g_range_capped]
         gbars = ax3.bar(g_range_capped, g_vals_capped, color=bar_colors, edgecolor="white")
         ax3.axvline(1, color="black", linewidth=1.2, linestyle="--")
         ax3.set_xlabel("|predicted_i − predicted_j|  (correct = 1)")

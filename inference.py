@@ -36,9 +36,9 @@ class Model:
         self._max_image_size = max_image_size
         # Thinking models must generate freely — constrained sampling blocks <think>.
         self._thinking = thinking
-        mm_limits = {"image": max_images, "video": 0}
+        mm_limits = {"image": max_images, "video": 0, "audio": 0}
         if video_mode:
-            mm_limits = {"image": 0, "video": 1}
+            mm_limits = {"image": 0, "video": 1, "audio": 0}
         extra_kwargs = {}
         if video_mode and max_model_len is None:
             # Video mode uses a 262K default context that exceeds available KV cache.
@@ -50,9 +50,6 @@ class Model:
             tensor_parallel_size=tensor_parallel_size,
             limit_mm_per_prompt=mm_limits,
             **extra_kwargs,
-            # Avoid the outlines backend; its diskcache dep imports sqlite3,
-            # which fails on this cluster (undefined symbol: sqlite3_deserialize).
-            guided_decoding_backend="lm-format-enforcer",
             # Some models (InternVL) ship custom code in their HF repo
             # and refuse to load without this flag.
             trust_remote_code=True,

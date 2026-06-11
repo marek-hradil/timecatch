@@ -9,6 +9,7 @@ export default defineConfig({
     proxy: {
       '/api': 'http://127.0.0.1:8000',
       '/frames': 'http://127.0.0.1:8000',
+      '/introductions': 'http://127.0.0.1:8000',
     },
   },
 })

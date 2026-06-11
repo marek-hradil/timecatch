@@ -13,6 +13,7 @@ import re
 import sys
 
 import matplotlib.pyplot as plt
+from colors import CHANCE_COLOR, MODEL_PALETTE
 
 
 def parse_path(path: str) -> tuple[str, str, str]:
@@ -83,7 +84,7 @@ def main(paths: list[str]) -> None:
 
     width = 0.8 / max(1, len(models))
     x = list(range(len(all_lens)))
-    colors = plt.cm.tab10.colors  # type: ignore[attr-defined]
+    colors = MODEL_PALETTE
     fig_w = max(10.0, 1.6 * len(all_lens) * len(models) ** 0.5)
     fig, ax = plt.subplots(figsize=(fig_w, 5.5))
 
@@ -98,7 +99,7 @@ def main(paths: list[str]) -> None:
             ax.text(bar.get_x() + bar.get_width() / 2, bar.get_height() + 0.8,
                     f"n={n}", ha="center", va="bottom", fontsize=7)
 
-    ax.axhline(y=50, color="salmon", linestyle="--", linewidth=1, label="chance (50%)")
+    ax.axhline(y=50, color=CHANCE_COLOR, linestyle="--", linewidth=1, label="chance (50%)")
     ax.set_xticks(x)
     ax.set_xticklabels([str(l) for l in all_lens])
     ax.set_xlabel("Sequence length (frames)")

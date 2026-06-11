@@ -18,6 +18,7 @@ from collections import defaultdict
 
 import matplotlib.pyplot as plt
 import numpy as np
+from colors import ABLATION_A, ABLATION_B, CHANCE_COLOR
 
 INT_RE     = re.compile(r"^\d+$")
 PAIR_GT_RE = re.compile(r"^\(\s*(\d+)\s*,\s*(\d+)\s*\)$")
@@ -137,9 +138,9 @@ def main(out_path: str) -> None:
         grand_without = np.mean(all_without) if all_without else 0.0
 
         width = 0.35
-        ax.bar(0, grand_with,    width, color="steelblue", edgecolor="white",
+        ax.bar(0, grand_with,    width, color=ABLATION_A, edgecolor="white",
                label="with scene desc",    zorder=2)
-        ax.bar(1, grand_without, width, color="salmon",    edgecolor="white",
+        ax.bar(1, grand_without, width, color=ABLATION_B, edgecolor="white",
                label="without scene desc", zorder=2)
 
         ax.text(0, grand_with    + 1.0, f"{grand_with:.1f}%",    ha="center", va="bottom", fontsize=9, fontweight="bold")
@@ -147,7 +148,7 @@ def main(out_path: str) -> None:
 
         # Chance line
         if CHANCE[task] is not None:
-            ax.axhline(CHANCE[task], color="gray", linestyle="--", linewidth=1,
+            ax.axhline(CHANCE[task], color=CHANCE_COLOR, linestyle="--", linewidth=1,
                        label=f"chance ({CHANCE[task]:.0f}%)", zorder=1)
 
         delta = grand_without - grand_with

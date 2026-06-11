@@ -18,6 +18,7 @@ import re
 import sys
 
 import matplotlib.pyplot as plt
+from colors import DATASET, CHANCE_COLOR, MODEL_PALETTE
 
 
 _SWAP_GT_RE = re.compile(r"^\(\s*(\d+)\s*,\s*(\d+)\s*\)$")
@@ -103,15 +104,15 @@ def main(paths: list[str], allow_craft_long: bool = False) -> None:
 
     width = 0.8 / max(1, len(datasets))
     x = list(range(len(all_lens)))
-    colors = plt.cm.tab10.colors  # type: ignore[attr-defined]
     fig_w = max(10.0, 1.6 * len(all_lens) * len(datasets) ** 0.5)
     fig, ax = plt.subplots(figsize=(fig_w, 5.5))
 
     for i, ds in enumerate(datasets):
         offset = (i - (len(datasets) - 1) / 2) * width
         ys = [a if a is not None else 0.0 for a in accs[ds]]
+        color = DATASET.get(ds, MODEL_PALETTE[i % len(MODEL_PALETTE)])
         bars = ax.bar([xi + offset for xi in x], ys, width,
-                      label=ds, color=colors[i % len(colors)], edgecolor="white")
+                      label=ds, color=color, edgecolor="white")
         for bar, n, a in zip(bars, counts[ds], accs[ds]):
             if a is None or n == 0:
                 continue
@@ -125,7 +126,7 @@ def main(paths: list[str], allow_craft_long: bool = False) -> None:
         chance = [100.0 / l for l in all_lens]
     else:
         chance = [100.0 / (l - 1) if l > 1 else 0.0 for l in all_lens]
-    ax.plot(x, chance, color="salmon", linestyle="--", linewidth=1,
+    ax.plot(x, chance, color=CHANCE_COLOR, linestyle="--", linewidth=1,
             marker="o", markersize=4, label="chance (per length)")
 
     ax.set_xticks(x)

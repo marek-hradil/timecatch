@@ -13,7 +13,7 @@ export default function LocalizeView() {
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-gray-50 p-4">
-      <div className="max-w-3xl w-full bg-white rounded-2xl shadow-sm border border-gray-200 overflow-hidden">
+      <div className="w-full bg-white rounded-2xl shadow-sm border border-gray-200 overflow-hidden">
         {/* Header */}
         <div className="bg-violet-600 px-8 py-4 flex items-center justify-between">
           <h2 className="text-white font-semibold">Localize: Which pair was swapped?</h2>
@@ -43,13 +43,13 @@ export default function LocalizeView() {
             </p>
           )}
 
-          <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
+          <div className="flex gap-3">
             {Array.from({ length: nPairs }, (_, i) => (
               <button
                 key={i}
                 onClick={() => submitAnswer([i, i + 1])}
                 disabled={loading}
-                className="py-3 px-4 bg-violet-100 hover:bg-violet-200 disabled:bg-violet-50 text-violet-800 font-medium rounded-xl transition-colors text-sm"
+                className="flex-1 py-3 px-4 bg-violet-100 hover:bg-violet-200 disabled:bg-violet-50 text-violet-800 font-medium rounded-xl transition-colors text-sm"
               >
                 Frame {i} ↔ {i + 1}
               </button>

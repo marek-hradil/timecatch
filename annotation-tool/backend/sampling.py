@@ -19,7 +19,7 @@ from typing import Optional
 sys.path.insert(0, str(Path(__file__).parent.parent.parent))
 from dataset import Dataset  # noqa: E402
 
-from .config import DATASET_CONFIGS, DATASETS_ROOT
+from .config import DATASET_CONFIGS, DATASETS_ROOT, GCS_PUBLIC_BASE
 
 
 @dataclass
@@ -49,11 +49,9 @@ def _swap_paths(paths: list[str], rng: random.Random) -> tuple[list[str], tuple[
 
 
 def _path_to_url(abs_path: str, dataset_name: str) -> str:
-    """
-    Convert an absolute frame path to a /frames/{dataset}/{relative} URL.
-    Strips the DATASETS_ROOT/{dataset_name}/ prefix.
-    """
     rel = Path(abs_path).relative_to(DATASETS_ROOT / dataset_name)
+    if GCS_PUBLIC_BASE:
+        return f"{GCS_PUBLIC_BASE}/datasets/{dataset_name}/{rel.as_posix()}"
     return f"/frames/{dataset_name}/{rel.as_posix()}"
 
 
