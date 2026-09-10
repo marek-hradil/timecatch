@@ -10,6 +10,7 @@ Critical: the RNG draw sequence must match the image-based original precisely:
 This asymmetry is load-bearing — any deviation shifts swap indices for all
 subsequent samples and breaks determinism.
 """
+import json
 import random
 import sys
 from dataclasses import dataclass
@@ -53,6 +54,81 @@ def _path_to_url(abs_path: str, dataset_name: str) -> str:
     if GCS_PUBLIC_BASE:
         return f"{GCS_PUBLIC_BASE}/datasets/{dataset_name}/{rel.as_posix()}"
     return f"/frames/{dataset_name}/{rel.as_posix()}"
+
+
+_ATTENTION_CHECKS_PATH = Path(__file__).parent / "attention_checks.json"
+
+
+def load_attention_check_samples(
+    dataset_name: str,
+    task: str,
+    n: int,
+) -> list[BinaryPathSample | PositionPathSample]:
+    """Load fixed attention-check samples from attention_checks.json."""
+    if not _ATTENTION_CHECKS_PATH.exists():
+        return []
+
+    with open(_ATTENTION_CHECKS_PATH) as f:
+        all_checks = json.load(f)
+
+    entries = all_checks.get(f"{dataset_name}_{task}", [])[:n]
+    if not entries:
+        return []
+
+    cfg = DATASET_CONFIGS[dataset_name]
+    root = cfg["path"]
+
+    with open(root / cfg["manifest"]) as f:
+        manifest_data = json.load(f)
+
+    scene_index: dict[str, tuple[list[str], str | None]] = {}
+    for entry in manifest_data:
+        name = Path(entry["scene_paths"][0]).parent.name
+        paths = [str(root / p) for p in entry["scene_paths"]]
+        scene_index[name] = (paths, entry.get("scene_description"))
+
+    results: list[BinaryPathSample | PositionPathSample] = []
+    for check in entries:
+        sample_name = check["sample_name"]
+        swap_pair = check.get("swap_pair")
+
+        if sample_name not in scene_index:
+            raise ValueError(
+                f"Attention check {sample_name!r} not found in {dataset_name} manifest"
+            )
+
+        paths, desc = scene_index[sample_name]
+
+        if swap_pair is not None:
+            i, j = int(swap_pair[0]), int(swap_pair[1])
+            ordered = list(paths)
+            ordered[i], ordered[j] = ordered[j], ordered[i]
+            urls = [_path_to_url(p, dataset_name) for p in ordered]
+        else:
+            urls = [_path_to_url(p, dataset_name) for p in paths]
+
+        if task == "detect":
+            results.append(BinaryPathSample(
+                sample_name=sample_name,
+                n_frames=len(paths),
+                frame_paths=urls,
+                ground_truth=swap_pair is not None,
+                scene_description=desc,
+            ))
+        else:
+            if swap_pair is None:
+                raise ValueError(
+                    f"Localize attention check {sample_name!r} must have a swap_pair"
+                )
+            results.append(PositionPathSample(
+                sample_name=sample_name,
+                n_frames=len(paths),
+                frame_paths=urls,
+                ground_truth=(int(swap_pair[0]), int(swap_pair[1])),
+                scene_description=desc,
+            ))
+
+    return results
 
 
 def sample_binary_paths(dataset_name: str, seed: int, n: int) -> list[BinaryPathSample]:

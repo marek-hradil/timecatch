@@ -2,9 +2,10 @@ import { useState, useEffect } from 'react'
 
 interface FrameStripProps {
   frameUrls: string[]
+  onViewerOpen?: () => void
 }
 
-export default function FrameStrip({ frameUrls }: FrameStripProps) {
+export default function FrameStrip({ frameUrls, onViewerOpen }: FrameStripProps) {
   const [activeIndex, setActiveIndex] = useState<number | null>(null)
 
   useEffect(() => {
@@ -25,7 +26,7 @@ export default function FrameStrip({ frameUrls }: FrameStripProps) {
           <div
             key={i}
             className="flex flex-col items-center gap-1 flex-1 min-w-[100px] cursor-zoom-in group"
-            onClick={() => setActiveIndex(i)}
+            onClick={() => { setActiveIndex(i); onViewerOpen?.() }}
           >
             <img
               src={url}

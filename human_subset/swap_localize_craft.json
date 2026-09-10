@@ -1,0 +1,889 @@
+{
+  "dataset": "CRAFT",
+  "task": "localize",
+  "stimuli": [
+    {
+      "scene_name": "scene_16_007735",
+      "shown_order": [
+        0,
+        1,
+        2,
+        3,
+        5,
+        4,
+        8
+      ],
+      "ground_truth": [
+        4,
+        5
+      ],
+      "n_frames": 7,
+      "annotations": [
+        {
+          "pid": "6928a6394052fbe76783ed32",
+          "human_answer": [
+            4,
+            5
+          ]
+        }
+      ]
+    },
+    {
+      "scene_name": "scene_5_002063",
+      "shown_order": [
+        0,
+        1,
+        2,
+        4,
+        3
+      ],
+      "ground_truth": [
+        3,
+        4
+      ],
+      "n_frames": 5,
+      "annotations": [
+        {
+          "pid": "6928a6394052fbe76783ed32",
+          "human_answer": [
+            3,
+            4
+          ]
+        }
+      ]
+    },
+    {
+      "scene_name": "scene_10_004563",
+      "shown_order": [
+        0,
+        2,
+        1,
+        3,
+        4,
+        5,
+        6
+      ],
+      "ground_truth": [
+        1,
+        2
+      ],
+      "n_frames": 7,
+      "annotations": [
+        {
+          "pid": "6928a6394052fbe76783ed32",
+          "human_answer": [
+            2,
+            3
+          ]
+        }
+      ]
+    },
+    {
+      "scene_name": "scene_12_005502",
+      "shown_order": [
+        1,
+        0,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7
+      ],
+      "ground_truth": [
+        0,
+        1
+      ],
+      "n_frames": 8,
+      "annotations": [
+        {
+          "pid": "6928a6394052fbe76783ed32",
+          "human_answer": [
+            0,
+            1
+          ]
+        }
+      ]
+    },
+    {
+      "scene_name": "scene_2_000897",
+      "shown_order": [
+        0,
+        1,
+        2,
+        3,
+        4,
+        6,
+        5
+      ],
+      "ground_truth": [
+        5,
+        6
+      ],
+      "n_frames": 7,
+      "annotations": [
+        {
+          "pid": "6928a6394052fbe76783ed32",
+          "human_answer": [
+            5,
+            6
+          ]
+        }
+      ]
+    },
+    {
+      "scene_name": "scene_9_004201",
+      "shown_order": [
+        0,
+        1,
+        4,
+        3
+      ],
+      "ground_truth": [
+        2,
+        3
+      ],
+      "n_frames": 4,
+      "annotations": [
+        {
+          "pid": "6928a6394052fbe76783ed32",
+          "human_answer": [
+            2,
+            3
+          ]
+        }
+      ]
+    },
+    {
+      "scene_name": "scene_1_000052",
+      "shown_order": [
+        0,
+        2,
+        1,
+        3,
+        4,
+        5,
+        6,
+        7
+      ],
+      "ground_truth": [
+        1,
+        2
+      ],
+      "n_frames": 8,
+      "annotations": [
+        {
+          "pid": "6928a6394052fbe76783ed32",
+          "human_answer": [
+            2,
+            3
+          ]
+        }
+      ]
+    },
+    {
+      "scene_name": "scene_11_005298",
+      "shown_order": [
+        0,
+        1,
+        3,
+        2
+      ],
+      "ground_truth": [
+        2,
+        3
+      ],
+      "n_frames": 4,
+      "annotations": [
+        {
+          "pid": "6928a6394052fbe76783ed32",
+          "human_answer": [
+            2,
+            3
+          ]
+        }
+      ]
+    },
+    {
+      "scene_name": "scene_9_004230",
+      "shown_order": [
+        1,
+        0,
+        4,
+        7
+      ],
+      "ground_truth": [
+        0,
+        1
+      ],
+      "n_frames": 4,
+      "annotations": [
+        {
+          "pid": "6928a6394052fbe76783ed32",
+          "human_answer": [
+            1,
+            2
+          ]
+        }
+      ]
+    },
+    {
+      "scene_name": "scene_5_002311",
+      "shown_order": [
+        0,
+        1,
+        3,
+        2,
+        4
+      ],
+      "ground_truth": [
+        2,
+        3
+      ],
+      "n_frames": 5,
+      "annotations": [
+        {
+          "pid": "6928a6394052fbe76783ed32",
+          "human_answer": [
+            2,
+            3
+          ]
+        }
+      ]
+    },
+    {
+      "scene_name": "scene_12_005575",
+      "shown_order": [
+        0,
+        1,
+        2,
+        3,
+        4,
+        6,
+        5,
+        11
+      ],
+      "ground_truth": [
+        5,
+        6
+      ],
+      "n_frames": 8,
+      "annotations": [
+        {
+          "pid": "6928a6394052fbe76783ed32",
+          "human_answer": [
+            5,
+            6
+          ]
+        }
+      ]
+    },
+    {
+      "scene_name": "scene_13_006141",
+      "shown_order": [
+        1,
+        0,
+        2,
+        3,
+        4
+      ],
+      "ground_truth": [
+        0,
+        1
+      ],
+      "n_frames": 5,
+      "annotations": [
+        {
+          "pid": "6928a6394052fbe76783ed32",
+          "human_answer": [
+            1,
+            2
+          ]
+        }
+      ]
+    },
+    {
+      "scene_name": "scene_11_005403",
+      "shown_order": [
+        0,
+        1,
+        3,
+        2
+      ],
+      "ground_truth": [
+        2,
+        3
+      ],
+      "n_frames": 4,
+      "annotations": [
+        {
+          "pid": "6980d349ae34723f48ea7a3d",
+          "human_answer": [
+            2,
+            3
+          ]
+        }
+      ]
+    },
+    {
+      "scene_name": "scene_6_002810",
+      "shown_order": [
+        0,
+        2,
+        1,
+        3,
+        4,
+        6,
+        11
+      ],
+      "ground_truth": [
+        1,
+        2
+      ],
+      "n_frames": 7,
+      "annotations": [
+        {
+          "pid": "6980d349ae34723f48ea7a3d",
+          "human_answer": [
+            1,
+            2
+          ]
+        }
+      ]
+    },
+    {
+      "scene_name": "scene_14_006563",
+      "shown_order": [
+        1,
+        0,
+        2,
+        3,
+        4
+      ],
+      "ground_truth": [
+        0,
+        1
+      ],
+      "n_frames": 5,
+      "annotations": [
+        {
+          "pid": "6980d349ae34723f48ea7a3d",
+          "human_answer": [
+            0,
+            1
+          ]
+        }
+      ]
+    },
+    {
+      "scene_name": "scene_9_004230",
+      "shown_order": [
+        0,
+        1,
+        7,
+        4
+      ],
+      "ground_truth": [
+        2,
+        3
+      ],
+      "n_frames": 4,
+      "annotations": [
+        {
+          "pid": "6980d349ae34723f48ea7a3d",
+          "human_answer": [
+            2,
+            3
+          ]
+        }
+      ]
+    },
+    {
+      "scene_name": "scene_18_008805",
+      "shown_order": [
+        0,
+        2,
+        1,
+        3,
+        4,
+        5,
+        6,
+        8
+      ],
+      "ground_truth": [
+        1,
+        2
+      ],
+      "n_frames": 8,
+      "annotations": [
+        {
+          "pid": "6980d349ae34723f48ea7a3d",
+          "human_answer": [
+            1,
+            2
+          ]
+        }
+      ]
+    },
+    {
+      "scene_name": "scene_17_008468",
+      "shown_order": [
+        0,
+        1,
+        2,
+        4,
+        3,
+        5,
+        6,
+        7
+      ],
+      "ground_truth": [
+        3,
+        4
+      ],
+      "n_frames": 8,
+      "annotations": [
+        {
+          "pid": "6980d349ae34723f48ea7a3d",
+          "human_answer": [
+            3,
+            4
+          ]
+        }
+      ]
+    },
+    {
+      "scene_name": "scene_19_009178",
+      "shown_order": [
+        1,
+        0,
+        2,
+        3,
+        4,
+        7
+      ],
+      "ground_truth": [
+        0,
+        1
+      ],
+      "n_frames": 6,
+      "annotations": [
+        {
+          "pid": "6980d349ae34723f48ea7a3d",
+          "human_answer": [
+            0,
+            1
+          ]
+        }
+      ]
+    },
+    {
+      "scene_name": "scene_5_002430",
+      "shown_order": [
+        0,
+        1,
+        3,
+        9,
+        5
+      ],
+      "ground_truth": [
+        3,
+        4
+      ],
+      "n_frames": 5,
+      "annotations": [
+        {
+          "pid": "6980d349ae34723f48ea7a3d",
+          "human_answer": [
+            3,
+            4
+          ]
+        }
+      ]
+    },
+    {
+      "scene_name": "scene_10_004983",
+      "shown_order": [
+        0,
+        1,
+        3,
+        2,
+        4,
+        5,
+        6
+      ],
+      "ground_truth": [
+        2,
+        3
+      ],
+      "n_frames": 7,
+      "annotations": [
+        {
+          "pid": "6980d349ae34723f48ea7a3d",
+          "human_answer": [
+            2,
+            3
+          ]
+        }
+      ]
+    },
+    {
+      "scene_name": "scene_2_000940",
+      "shown_order": [
+        1,
+        0,
+        2,
+        3,
+        11
+      ],
+      "ground_truth": [
+        0,
+        1
+      ],
+      "n_frames": 5,
+      "annotations": [
+        {
+          "pid": "6980d349ae34723f48ea7a3d",
+          "human_answer": [
+            0,
+            1
+          ]
+        }
+      ]
+    },
+    {
+      "scene_name": "scene_11_005298",
+      "shown_order": [
+        0,
+        2,
+        1,
+        3
+      ],
+      "ground_truth": [
+        1,
+        2
+      ],
+      "n_frames": 4,
+      "annotations": [
+        {
+          "pid": "6980d349ae34723f48ea7a3d",
+          "human_answer": [
+            1,
+            2
+          ]
+        },
+        {
+          "pid": "6a15a7350b637a73954ea47f",
+          "human_answer": [
+            1,
+            2
+          ]
+        }
+      ]
+    },
+    {
+      "scene_name": "scene_2_000915",
+      "shown_order": [
+        0,
+        1,
+        2,
+        3,
+        5,
+        4,
+        10
+      ],
+      "ground_truth": [
+        4,
+        5
+      ],
+      "n_frames": 7,
+      "annotations": [
+        {
+          "pid": "6980d349ae34723f48ea7a3d",
+          "human_answer": [
+            4,
+            5
+          ]
+        }
+      ]
+    },
+    {
+      "scene_name": "scene_10_004643",
+      "shown_order": [
+        0,
+        2,
+        1,
+        3,
+        4,
+        5,
+        6
+      ],
+      "ground_truth": [
+        1,
+        2
+      ],
+      "n_frames": 7,
+      "annotations": [
+        {
+          "pid": "6a15a7350b637a73954ea47f",
+          "human_answer": [
+            1,
+            2
+          ]
+        }
+      ]
+    },
+    {
+      "scene_name": "scene_9_004122",
+      "shown_order": [
+        0,
+        4,
+        1,
+        5
+      ],
+      "ground_truth": [
+        1,
+        2
+      ],
+      "n_frames": 4,
+      "annotations": [
+        {
+          "pid": "6a15a7350b637a73954ea47f",
+          "human_answer": [
+            1,
+            2
+          ]
+        }
+      ]
+    },
+    {
+      "scene_name": "scene_19_009044",
+      "shown_order": [
+        0,
+        1,
+        3,
+        2,
+        4,
+        5,
+        6,
+        8
+      ],
+      "ground_truth": [
+        2,
+        3
+      ],
+      "n_frames": 8,
+      "annotations": [
+        {
+          "pid": "6a15a7350b637a73954ea47f",
+          "human_answer": [
+            2,
+            3
+          ]
+        }
+      ]
+    },
+    {
+      "scene_name": "scene_8_003981",
+      "shown_order": [
+        0,
+        3,
+        5,
+        4,
+        9
+      ],
+      "ground_truth": [
+        2,
+        3
+      ],
+      "n_frames": 5,
+      "annotations": [
+        {
+          "pid": "6a15a7350b637a73954ea47f",
+          "human_answer": [
+            2,
+            3
+          ]
+        }
+      ]
+    },
+    {
+      "scene_name": "scene_2_000840",
+      "shown_order": [
+        0,
+        2,
+        1,
+        3,
+        4,
+        8
+      ],
+      "ground_truth": [
+        1,
+        2
+      ],
+      "n_frames": 6,
+      "annotations": [
+        {
+          "pid": "6a15a7350b637a73954ea47f",
+          "human_answer": [
+            1,
+            2
+          ]
+        }
+      ]
+    },
+    {
+      "scene_name": "scene_19_009148",
+      "shown_order": [
+        0,
+        1,
+        2,
+        4,
+        3,
+        6
+      ],
+      "ground_truth": [
+        3,
+        4
+      ],
+      "n_frames": 6,
+      "annotations": [
+        {
+          "pid": "6a15a7350b637a73954ea47f",
+          "human_answer": [
+            3,
+            4
+          ]
+        }
+      ]
+    },
+    {
+      "scene_name": "scene_2_000914",
+      "shown_order": [
+        0,
+        1,
+        3,
+        2
+      ],
+      "ground_truth": [
+        2,
+        3
+      ],
+      "n_frames": 4,
+      "annotations": [
+        {
+          "pid": "6a15a7350b637a73954ea47f",
+          "human_answer": [
+            2,
+            3
+          ]
+        }
+      ]
+    },
+    {
+      "scene_name": "scene_11_005170",
+      "shown_order": [
+        1,
+        0,
+        2,
+        3,
+        4,
+        5,
+        7
+      ],
+      "ground_truth": [
+        0,
+        1
+      ],
+      "n_frames": 7,
+      "annotations": [
+        {
+          "pid": "6a15a7350b637a73954ea47f",
+          "human_answer": [
+            0,
+            1
+          ]
+        }
+      ]
+    },
+    {
+      "scene_name": "scene_12_005602",
+      "shown_order": [
+        0,
+        1,
+        2,
+        3,
+        5,
+        4,
+        8,
+        10
+      ],
+      "ground_truth": [
+        4,
+        5
+      ],
+      "n_frames": 8,
+      "annotations": [
+        {
+          "pid": "6a15a7350b637a73954ea47f",
+          "human_answer": [
+            4,
+            5
+          ]
+        }
+      ]
+    },
+    {
+      "scene_name": "scene_5_002362",
+      "shown_order": [
+        0,
+        1,
+        2,
+        3,
+        5,
+        4,
+        6,
+        7
+      ],
+      "ground_truth": [
+        4,
+        5
+      ],
+      "n_frames": 8,
+      "annotations": [
+        {
+          "pid": "6a15a7350b637a73954ea47f",
+          "human_answer": [
+            4,
+            5
+          ]
+        }
+      ]
+    },
+    {
+      "scene_name": "scene_15_007059",
+      "shown_order": [
+        0,
+        1,
+        2,
+        3,
+        5,
+        4
+      ],
+      "ground_truth": [
+        4,
+        5
+      ],
+      "n_frames": 6,
+      "annotations": [
+        {
+          "pid": "6a15a7350b637a73954ea47f",
+          "human_answer": [
+            4,
+            5
+          ]
+        }
+      ]
+    }
+  ]
+}

@@ -23,6 +23,7 @@ from .db import (
     count_annotations,
     init_db,
     mark_completed,
+    update_instruction_metrics,
     upsert_annotation,
     upsert_participant,
 )
@@ -96,6 +97,19 @@ class SessionRequest(BaseModel):
     prolific_pid: str
     dataset: str
     task: str
+    scene_id: str = "main"
+    study_id: str | None = None
+    session_id: str | None = None
+
+
+class SessionMetricsRequest(BaseModel):
+    prolific_pid: str
+    dataset: str
+    task: str
+    scene_id: str = "main"
+    instructions_duration_s: float | None = None
+    instructions_lightbox_opens: int | None = None
+    video_played: bool | None = None
 
 
 class SampleOut(BaseModel):
@@ -122,6 +136,9 @@ class AnnotateRequest(BaseModel):
     task: str
     sample_index: int
     human_answer: Union[bool, list[int]]  # bool for detect, [i, j] for localize
+    scene_id: str = "main"
+    view_duration_s: float | None = None
+    viewer_opens: int | None = None
 
 
 class AnnotateResponse(BaseModel):
@@ -139,7 +156,10 @@ def create_session(req: SessionRequest) -> SessionResponse:
     _validate_condition(req.dataset, req.task)
 
     seed = pid_to_seed(req.prolific_pid)
-    upsert_participant(req.prolific_pid, req.dataset, req.task, seed)
+    upsert_participant(
+        req.prolific_pid, req.dataset, req.task, seed,
+        scene_id=req.scene_id, study_id=req.study_id, session_id=req.session_id,
+    )
 
     plan = build_plan(req.prolific_pid, req.dataset, req.task)
     instructions_key = f"{req.dataset}_{req.task}"
@@ -200,15 +220,30 @@ def annotate(req: AnnotateRequest) -> AnnotateResponse:
         sample.n_frames,
         gt,
         ha,
+        scene_id=req.scene_id,
+        is_attention_check=sample.is_attention_check,
+        view_duration_s=req.view_duration_s,
+        viewer_opens=req.viewer_opens,
     )
 
-    annotated = count_annotations(req.prolific_pid, req.dataset, req.task)
+    annotated = count_annotations(req.prolific_pid, req.dataset, req.task, req.scene_id)
     completed = annotated >= n
 
     if completed:
-        mark_completed(req.prolific_pid, req.dataset, req.task)
+        mark_completed(req.prolific_pid, req.dataset, req.task, req.scene_id)
 
     return AnnotateResponse(ok=True, annotated=annotated, total=n, completed=completed)
+
+
+@app.post("/api/session/metrics", response_model=dict)
+def session_metrics(req: SessionMetricsRequest) -> dict:
+    _validate_pid(req.prolific_pid)
+    _validate_condition(req.dataset, req.task)
+    update_instruction_metrics(
+        req.prolific_pid, req.dataset, req.task, req.scene_id,
+        req.instructions_duration_s, req.instructions_lightbox_opens, req.video_played,
+    )
+    return {"ok": True}
 
 
 # ── SPA fallback (production only) ───────────────────────────────────────────

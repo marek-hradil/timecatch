@@ -14,7 +14,7 @@ def swap_localize_pattern(n: int) -> str:
 
 
 def main(cfg: dict) -> None:
-    model = Model(cfg["model"]["path"], tensor_parallel_size=cfg["model"].get("tensor_parallel_size", 1), video_mode=cfg["model"].get("video_mode", False), max_model_len=cfg["model"].get("max_model_len"), max_image_size=cfg["model"].get("max_image_size"))
+    model = Model(cfg["model"]["path"], tensor_parallel_size=cfg["model"].get("tensor_parallel_size", 1), video_mode=cfg["model"].get("video_mode", False), max_model_len=cfg["model"].get("max_model_len"), max_image_size=cfg["model"].get("max_image_size"), enforce_eager=cfg["model"].get("enforce_eager", False), lora_path=cfg["model"].get("lora_path"), lora_rank=cfg["model"].get("lora_rank", 16))
     base = Dataset(cfg["dataset"]["path"], cfg["dataset"]["seq_len_min"], cfg["dataset"]["seq_len_max"], seed=cfg["seed"], manifest=cfg["dataset"].get("manifest"))
     scenarios = SwapDataset(base).sample_position(cfg.get("n"))
     exp_name = f"swap_localize_{cfg['dataset']['name']}_{cfg['model']['name']}"

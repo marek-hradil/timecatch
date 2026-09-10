@@ -23,10 +23,10 @@ MODELS = [
 DATASETS = ["clevrer", "craft", "drive-lm", "mtl-aqa"]
 TASKS = ["corrupt_detect", "corrupt_localize", "swap_detect", "swap_localize"]
 TASK_LABELS = {
-    "corrupt_detect": "corrupt\ndetect",
-    "corrupt_localize": "corrupt\nlocalize",
-    "swap_detect": "swap\ndetect",
-    "swap_localize": "swap\nlocalize",
+    "corrupt_detect": "Frame\nDetect",
+    "corrupt_localize": "Frame\nLocalize",
+    "swap_detect": "Temporal\nDetect",
+    "swap_localize": "Temporal\nLocalize",
 }
 
 
@@ -105,7 +105,7 @@ def main() -> None:
 
     blues = plt.cm.Blues(np.linspace(0.35, 0.85, n_models))  # type: ignore[attr-defined]
 
-    fig, ax = plt.subplots(figsize=(10, 5))
+    fig, ax = plt.subplots(figsize=(6, 3.5))
 
     for i, (label, _) in enumerate(MODELS):
         ys = [accs[task][i] for task in TASKS]
@@ -126,11 +126,11 @@ def main() -> None:
                 f"{val:.1f}",
                 ha="center",
                 va="bottom",
-                fontsize=10,
+                fontsize=7,
             )
 
     ax.set_xticks(x)
-    ax.set_xticklabels([TASK_LABELS[t] for t in TASKS], fontsize=13)
+    ax.set_xticklabels([TASK_LABELS[t] for t in TASKS], fontsize=12)
     ax.set_ylabel("Accuracy (%)", fontsize=13)
     ax.tick_params(axis="y", labelsize=12)
     ax.set_ylim(0, 115)
@@ -140,8 +140,8 @@ def main() -> None:
     ax.spines["right"].set_visible(False)
     ax.legend(
         title="Model size",
-        fontsize=18,
-        title_fontsize=18,
+        fontsize=12,
+        title_fontsize=12,
         loc="upper right",
         frameon=True,
     )

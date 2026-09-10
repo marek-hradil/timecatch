@@ -9,7 +9,8 @@ Two-pass filter:
 Writes datasets/<DATASET>/scenes_filtered.json — the original scenes.json is untouched.
 
 Usage:
-    python3 scripts/filter_scenes.py [clevrer | craft | drivelm | mtl-aqa]
+    python3 scripts/filter_scenes.py [clevrer | craft | drivelm | mtl-aqa] [input.json] [output.json]
+    # input/output default to scenes.json / scenes_filtered.json
 """
 
 import json
@@ -71,8 +72,8 @@ def main():
 
     name = sys.argv[1]
     dset_dir = dataset_dir(name)
-    input_json = os.path.join(dset_dir, "scenes.json")
-    output_json = os.path.join(dset_dir, "scenes_filtered.json")
+    input_json = os.path.join(dset_dir, sys.argv[2] if len(sys.argv) > 2 else "scenes.json")
+    output_json = os.path.join(dset_dir, sys.argv[3] if len(sys.argv) > 3 else "scenes_filtered.json")
 
     with open(input_json) as f:
         scenes = json.load(f)

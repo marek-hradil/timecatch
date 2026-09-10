@@ -1,0 +1,681 @@
+{
+  "dataset": "CLEVRER",
+  "task": "detect",
+  "stimuli": [
+    {
+      "scene_name": "scene_11679",
+      "shown_order": [
+        0,
+        3,
+        4,
+        5,
+        6,
+        7
+      ],
+      "ground_truth": false,
+      "n_frames": 6,
+      "annotations": [
+        {
+          "pid": "5f88a2f32c535806aefae159",
+          "human_answer": true
+        }
+      ]
+    },
+    {
+      "scene_name": "scene_12716",
+      "shown_order": [
+        0,
+        2,
+        3,
+        5,
+        4,
+        6,
+        7
+      ],
+      "ground_truth": true,
+      "n_frames": 7,
+      "annotations": [
+        {
+          "pid": "5f88a2f32c535806aefae159",
+          "human_answer": true
+        }
+      ]
+    },
+    {
+      "scene_name": "scene_11354",
+      "shown_order": [
+        2,
+        0,
+        3,
+        4,
+        5,
+        6
+      ],
+      "ground_truth": true,
+      "n_frames": 6,
+      "annotations": [
+        {
+          "pid": "5f88a2f32c535806aefae159",
+          "human_answer": true
+        }
+      ]
+    },
+    {
+      "scene_name": "scene_12186",
+      "shown_order": [
+        0,
+        1,
+        2,
+        4,
+        3,
+        5,
+        6,
+        7
+      ],
+      "ground_truth": true,
+      "n_frames": 8,
+      "annotations": [
+        {
+          "pid": "5f88a2f32c535806aefae159",
+          "human_answer": true
+        }
+      ]
+    },
+    {
+      "scene_name": "scene_10468",
+      "shown_order": [
+        0,
+        3,
+        4,
+        5,
+        6
+      ],
+      "ground_truth": false,
+      "n_frames": 5,
+      "annotations": [
+        {
+          "pid": "5f88a2f32c535806aefae159",
+          "human_answer": false
+        }
+      ]
+    },
+    {
+      "scene_name": "scene_12197",
+      "shown_order": [
+        0,
+        3,
+        4,
+        6
+      ],
+      "ground_truth": false,
+      "n_frames": 4,
+      "annotations": [
+        {
+          "pid": "5f88a2f32c535806aefae159",
+          "human_answer": false
+        },
+        {
+          "pid": "69b5ab8f91a66a7b221b0d3f",
+          "human_answer": false
+        }
+      ]
+    },
+    {
+      "scene_name": "scene_12440",
+      "shown_order": [
+        0,
+        1,
+        3,
+        2,
+        4,
+        5,
+        6,
+        7
+      ],
+      "ground_truth": true,
+      "n_frames": 8,
+      "annotations": [
+        {
+          "pid": "5f88a2f32c535806aefae159",
+          "human_answer": true
+        }
+      ]
+    },
+    {
+      "scene_name": "scene_13897",
+      "shown_order": [
+        0,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7
+      ],
+      "ground_truth": false,
+      "n_frames": 7,
+      "annotations": [
+        {
+          "pid": "5f88a2f32c535806aefae159",
+          "human_answer": false
+        }
+      ]
+    },
+    {
+      "scene_name": "scene_12742",
+      "shown_order": [
+        0,
+        3,
+        2,
+        4,
+        5,
+        6,
+        7
+      ],
+      "ground_truth": true,
+      "n_frames": 7,
+      "annotations": [
+        {
+          "pid": "5f88a2f32c535806aefae159",
+          "human_answer": true
+        }
+      ]
+    },
+    {
+      "scene_name": "scene_12725",
+      "shown_order": [
+        0,
+        3,
+        5,
+        4,
+        7
+      ],
+      "ground_truth": true,
+      "n_frames": 5,
+      "annotations": [
+        {
+          "pid": "5f88a2f32c535806aefae159",
+          "human_answer": true
+        }
+      ]
+    },
+    {
+      "scene_name": "scene_13972",
+      "shown_order": [
+        0,
+        1,
+        2,
+        3,
+        4,
+        5
+      ],
+      "ground_truth": false,
+      "n_frames": 6,
+      "annotations": [
+        {
+          "pid": "5f88a2f32c535806aefae159",
+          "human_answer": false
+        }
+      ]
+    },
+    {
+      "scene_name": "scene_11789",
+      "shown_order": [
+        2,
+        0,
+        3,
+        4
+      ],
+      "ground_truth": true,
+      "n_frames": 4,
+      "annotations": [
+        {
+          "pid": "5f88a2f32c535806aefae159",
+          "human_answer": true
+        }
+      ]
+    },
+    {
+      "scene_name": "scene_11556",
+      "shown_order": [
+        0,
+        3,
+        5,
+        4,
+        6
+      ],
+      "ground_truth": true,
+      "n_frames": 5,
+      "annotations": [
+        {
+          "pid": "69b5ab8f91a66a7b221b0d3f",
+          "human_answer": false
+        }
+      ]
+    },
+    {
+      "scene_name": "scene_13145",
+      "shown_order": [
+        1,
+        0,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7
+      ],
+      "ground_truth": true,
+      "n_frames": 8,
+      "annotations": [
+        {
+          "pid": "69b5ab8f91a66a7b221b0d3f",
+          "human_answer": false
+        }
+      ]
+    },
+    {
+      "scene_name": "scene_11971",
+      "shown_order": [
+        0,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7
+      ],
+      "ground_truth": false,
+      "n_frames": 7,
+      "annotations": [
+        {
+          "pid": "69b5ab8f91a66a7b221b0d3f",
+          "human_answer": false
+        }
+      ]
+    },
+    {
+      "scene_name": "scene_12771",
+      "shown_order": [
+        0,
+        2,
+        4,
+        3,
+        6
+      ],
+      "ground_truth": true,
+      "n_frames": 5,
+      "annotations": [
+        {
+          "pid": "69b5ab8f91a66a7b221b0d3f",
+          "human_answer": true
+        }
+      ]
+    },
+    {
+      "scene_name": "scene_14954",
+      "shown_order": [
+        0,
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7
+      ],
+      "ground_truth": false,
+      "n_frames": 8,
+      "annotations": [
+        {
+          "pid": "69b5ab8f91a66a7b221b0d3f",
+          "human_answer": false
+        }
+      ]
+    },
+    {
+      "scene_name": "scene_13614",
+      "shown_order": [
+        0,
+        4,
+        5,
+        7
+      ],
+      "ground_truth": false,
+      "n_frames": 4,
+      "annotations": [
+        {
+          "pid": "69b5ab8f91a66a7b221b0d3f",
+          "human_answer": false
+        }
+      ]
+    },
+    {
+      "scene_name": "scene_10586",
+      "shown_order": [
+        0,
+        2,
+        4,
+        5,
+        6,
+        7
+      ],
+      "ground_truth": false,
+      "n_frames": 6,
+      "annotations": [
+        {
+          "pid": "69b5ab8f91a66a7b221b0d3f",
+          "human_answer": false
+        }
+      ]
+    },
+    {
+      "scene_name": "scene_12908",
+      "shown_order": [
+        0,
+        3,
+        4,
+        5,
+        6,
+        7
+      ],
+      "ground_truth": false,
+      "n_frames": 6,
+      "annotations": [
+        {
+          "pid": "69b5ab8f91a66a7b221b0d3f",
+          "human_answer": true
+        }
+      ]
+    },
+    {
+      "scene_name": "scene_13693",
+      "shown_order": [
+        0,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7
+      ],
+      "ground_truth": false,
+      "n_frames": 7,
+      "annotations": [
+        {
+          "pid": "69b5ab8f91a66a7b221b0d3f",
+          "human_answer": false
+        }
+      ]
+    },
+    {
+      "scene_name": "scene_13831",
+      "shown_order": [
+        0,
+        1,
+        2,
+        3,
+        5,
+        4,
+        6,
+        7
+      ],
+      "ground_truth": true,
+      "n_frames": 8,
+      "annotations": [
+        {
+          "pid": "69b5ab8f91a66a7b221b0d3f",
+          "human_answer": true
+        }
+      ]
+    },
+    {
+      "scene_name": "scene_13715",
+      "shown_order": [
+        2,
+        0,
+        3,
+        4,
+        5,
+        6,
+        7
+      ],
+      "ground_truth": true,
+      "n_frames": 7,
+      "annotations": [
+        {
+          "pid": "69b5ab8f91a66a7b221b0d3f",
+          "human_answer": true
+        }
+      ]
+    },
+    {
+      "scene_name": "scene_11474",
+      "shown_order": [
+        2,
+        0,
+        3,
+        4,
+        5,
+        6,
+        7
+      ],
+      "ground_truth": true,
+      "n_frames": 7,
+      "annotations": [
+        {
+          "pid": "6a216f07d825b2fc1a00475d",
+          "human_answer": true
+        }
+      ]
+    },
+    {
+      "scene_name": "scene_10100",
+      "shown_order": [
+        0,
+        1,
+        2,
+        3,
+        4,
+        5,
+        7,
+        6
+      ],
+      "ground_truth": true,
+      "n_frames": 8,
+      "annotations": [
+        {
+          "pid": "6a216f07d825b2fc1a00475d",
+          "human_answer": false
+        }
+      ]
+    },
+    {
+      "scene_name": "scene_10051",
+      "shown_order": [
+        0,
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7
+      ],
+      "ground_truth": false,
+      "n_frames": 8,
+      "annotations": [
+        {
+          "pid": "6a216f07d825b2fc1a00475d",
+          "human_answer": false
+        }
+      ]
+    },
+    {
+      "scene_name": "scene_11175",
+      "shown_order": [
+        0,
+        2,
+        4,
+        3,
+        5,
+        6,
+        7
+      ],
+      "ground_truth": true,
+      "n_frames": 7,
+      "annotations": [
+        {
+          "pid": "6a216f07d825b2fc1a00475d",
+          "human_answer": true
+        }
+      ]
+    },
+    {
+      "scene_name": "scene_14822",
+      "shown_order": [
+        3,
+        0,
+        4,
+        6
+      ],
+      "ground_truth": true,
+      "n_frames": 4,
+      "annotations": [
+        {
+          "pid": "6a216f07d825b2fc1a00475d",
+          "human_answer": true
+        }
+      ]
+    },
+    {
+      "scene_name": "scene_12963",
+      "shown_order": [
+        3,
+        0,
+        4,
+        5,
+        6,
+        7
+      ],
+      "ground_truth": true,
+      "n_frames": 6,
+      "annotations": [
+        {
+          "pid": "6a216f07d825b2fc1a00475d",
+          "human_answer": true
+        }
+      ]
+    },
+    {
+      "scene_name": "scene_14041",
+      "shown_order": [
+        0,
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7
+      ],
+      "ground_truth": false,
+      "n_frames": 8,
+      "annotations": [
+        {
+          "pid": "6a216f07d825b2fc1a00475d",
+          "human_answer": true
+        }
+      ]
+    },
+    {
+      "scene_name": "scene_11771",
+      "shown_order": [
+        0,
+        3,
+        4,
+        5,
+        7
+      ],
+      "ground_truth": false,
+      "n_frames": 5,
+      "annotations": [
+        {
+          "pid": "6a216f07d825b2fc1a00475d",
+          "human_answer": true
+        }
+      ]
+    },
+    {
+      "scene_name": "scene_14768",
+      "shown_order": [
+        0,
+        3,
+        5,
+        7
+      ],
+      "ground_truth": false,
+      "n_frames": 4,
+      "annotations": [
+        {
+          "pid": "6a216f07d825b2fc1a00475d",
+          "human_answer": false
+        }
+      ]
+    },
+    {
+      "scene_name": "scene_12313",
+      "shown_order": [
+        0,
+        3,
+        4,
+        5,
+        6
+      ],
+      "ground_truth": false,
+      "n_frames": 5,
+      "annotations": [
+        {
+          "pid": "6a216f07d825b2fc1a00475d",
+          "human_answer": false
+        }
+      ]
+    },
+    {
+      "scene_name": "scene_10604",
+      "shown_order": [
+        2,
+        0,
+        3,
+        5
+      ],
+      "ground_truth": true,
+      "n_frames": 4,
+      "annotations": [
+        {
+          "pid": "6a216f07d825b2fc1a00475d",
+          "human_answer": true
+        }
+      ]
+    },
+    {
+      "scene_name": "scene_10342",
+      "shown_order": [
+        0,
+        3,
+        4,
+        5,
+        6,
+        7
+      ],
+      "ground_truth": false,
+      "n_frames": 6,
+      "annotations": [
+        {
+          "pid": "6a216f07d825b2fc1a00475d",
+          "human_answer": true
+        }
+      ]
+    }
+  ]
+}

@@ -12,6 +12,7 @@ Usage:
     python plotting/plot_heatmap.py results/qwen3-vl-8b/corrupt_localize_*.csv
     python plotting/plot_heatmap.py results/qwen3-vl-8b/swap_localize_*.csv
 """
+import argparse
 import csv
 import os
 import re
@@ -218,16 +219,20 @@ def plot(rows: list[dict], task: str, n_files: int, out_path: str) -> None:
 
 
 if __name__ == "__main__":
-    if len(sys.argv) < 2:
-        sys.exit("Usage: python plot_heatmap.py <results.csv> [...]")
+    parser = argparse.ArgumentParser(description="Heatmap of GT vs predicted localize position.")
+    parser.add_argument("csvs", nargs="+", metavar="CSV", help="Result CSV files")
+    parser.add_argument("--out", metavar="PATH", help="Output PNG path (default: next to first CSV)")
+    args = parser.parse_args()
 
-    paths = sys.argv[1:]
+    paths = args.csvs
     task  = detect_task(paths)
-
     rows  = load_swap(paths) if task == "swap_localize" else load_corrupt(paths)
 
-    src_dir  = os.path.dirname(os.path.abspath(paths[0])) or "."
-    out_name = "swap_localize_heatmap.png" if task == "swap_localize" else "corrupt_localize_heatmap.png"
-    out_path = os.path.join(src_dir, out_name)
+    if args.out:
+        out_path = args.out
+    else:
+        src_dir  = os.path.dirname(os.path.abspath(paths[0])) or "."
+        out_name = "swap_localize_heatmap.png" if task == "swap_localize" else "corrupt_localize_heatmap.png"
+        out_path = os.path.join(src_dir, out_name)
 
     plot(rows, task, len(paths), out_path)

@@ -3,9 +3,10 @@ import FrameStrip from './FrameStrip'
 
 export default function LocalizeView() {
   const state = useStore()
-  const { cursor, session, loading, submitAnswer } = state
+  const { cursor, session, answers, loading, submitAnswer, goBack, goForward, incrementViewerOpens } = state
   const sample = currentSample(state)
   const total = session?.total ?? 0
+  const prev = answers[cursor] as [number, number] | undefined
 
   if (!sample) return null
 
@@ -35,26 +36,55 @@ export default function LocalizeView() {
             Exactly one adjacent pair has been swapped. Click which pair.
           </p>
 
-          <FrameStrip frameUrls={sample.frame_urls} />
+          <FrameStrip frameUrls={sample.frame_urls} onViewerOpen={incrementViewerOpens} />
 
           {sample.scene_description && (
-            <p className="text-center text-gray-400 text-xs italic">
+            <p className="text-center text-gray-500 text-sm">
               {sample.scene_description}
             </p>
           )}
 
           <div className="flex gap-3">
-            {Array.from({ length: nPairs }, (_, i) => (
-              <button
-                key={i}
-                onClick={() => submitAnswer([i, i + 1])}
-                disabled={loading}
-                className="flex-1 py-3 px-4 bg-violet-100 hover:bg-violet-200 disabled:bg-violet-50 text-violet-800 font-medium rounded-xl transition-colors text-sm"
-              >
-                Frame {i} ↔ {i + 1}
-              </button>
-            ))}
+            {Array.from({ length: nPairs }, (_, i) => {
+              const isPrev = prev !== undefined && prev[0] === i && prev[1] === i + 1
+              return (
+                <button
+                  key={i}
+                  onClick={() => submitAnswer([i, i + 1])}
+                  disabled={loading}
+                  className={`flex-1 py-3 px-4 font-medium rounded-xl transition-colors text-sm text-violet-800 disabled:opacity-40
+                    ${isPrev
+                      ? 'bg-violet-300 ring-2 ring-violet-400 ring-offset-2'
+                      : 'bg-violet-100 hover:bg-violet-200 disabled:bg-violet-50'}`}
+                >
+                  Frame {i} ↔ {i + 1}
+                </button>
+              )
+            })}
           </div>
+
+          {(cursor > 0 || prev !== undefined) && (
+            <div className="flex justify-between">
+              {cursor > 0 ? (
+                <button
+                  onClick={goBack}
+                  disabled={loading}
+                  className="px-5 py-3 text-base font-medium text-gray-600 bg-gray-100 hover:bg-gray-200 disabled:opacity-40 rounded-xl transition-colors"
+                >
+                  ← Back
+                </button>
+              ) : <div />}
+              {prev !== undefined && (
+                <button
+                  onClick={goForward}
+                  disabled={loading}
+                  className="px-5 py-3 text-base font-medium text-gray-600 bg-gray-100 hover:bg-gray-200 disabled:opacity-40 rounded-xl transition-colors"
+                >
+                  Next →
+                </button>
+              )}
+            </div>
+          )}
         </div>
       </div>
     </div>

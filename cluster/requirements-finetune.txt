@@ -1,0 +1,24 @@
+# Separate wheel set from cluster/requirements.txt (vLLM eval env) so ms-swift's
+# transformers/peft/accelerate resolution can't collide with the pinned vLLM 0.19.1
+# dependency set. Installed into its own .venv-finetune on the cluster.
+#
+# torch/torchvision pinned to a CUDA 12.8 build explicitly: plain PyPI `torch`
+# now defaults to a CUDA 13 build, which this cluster's driver (forward-compat
+# bridged only up to 12.8 via nvidia-hpc-sdk/25.3) can't initialize — torch
+# silently falls back to CPU instead of erroring, which is what actually
+# happened on the first training attempt (~275s/step on CPU vs. real GPU
+# speed). Versions must be pulled from the pytorch.org index, not PyPI.
+--extra-index-url https://download.pytorch.org/whl/cu128
+torch==2.11.0+cu128
+torchvision==0.26.0+cu128
+ms-swift
+qwen_vl_utils>=0.0.14
+# torchvision above covers qwen_vl_utils/vision_process.py's undeclared import
+# (not in its PyPI metadata, so pip wouldn't pull it in on its own).
+decord
+pillow
+numpy
+pyyaml
+huggingface_hub
+setuptools
+wheel

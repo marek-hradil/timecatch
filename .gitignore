@@ -8,12 +8,14 @@ wheels/
 
 # Virtual environments
 .venv
+.venv-finetune
 models/
 datasets/
 failures/
 annotation-tool/annotations/
 logs/
 outputs/
+checkpoints/
 
 # User-specific cluster config
 cluster/env.sh
@@ -23,3 +25,4 @@ cluster/bin/
 cluster/wheels*/
 cluster/hf_cache/
 annotation-tool/introductions
+annotation-tool/.venv

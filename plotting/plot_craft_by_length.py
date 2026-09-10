@@ -7,6 +7,7 @@ Usage:
   python plotting/plot_craft_by_length.py                        # auto-discover results/*
   python plotting/plot_craft_by_length.py results/qwen3-vl-8b results/intern-vl-3-5
 """
+
 import csv
 import os
 import re
@@ -21,30 +22,30 @@ BASE = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
 TASKS = ["corrupt_detect", "corrupt_localize", "swap_detect", "swap_localize"]
 TASK_LABELS = {
-    "corrupt_detect":   "Corrupt Detect",
-    "corrupt_localize": "Corrupt Localize",
-    "swap_detect":      "Swap Detect",
-    "swap_localize":    "Swap Localize",
+    "corrupt_detect": "Frame Detect",
+    "corrupt_localize": "Frame Localize",
+    "swap_detect": "Temporal Detect",
+    "swap_localize": "Temporal Localize",
 }
 
 MODEL_LABELS = {
-    "qwen2-5-vl-7b":  "Qwen2.5-VL-7B",
-    "qwen3-vl-8b":    "Qwen3-VL-8B",
-    "intern-vl-3-5":  "InternVL3.5",
-    "intern-vl-3":    "InternVL3",
-    "intern-vl":      "InternVL",
-    "qwen3-vl-2b":    "Qwen3-VL-2B",
-    "qwen3-vl-4b":    "Qwen3-VL-4B",
-    "qwen3-vl-32b":   "Qwen3-VL-32B",
-    "gemma-4-e4b":    "Gemma4-E4B",
-    "molmo-7b":       "Molmo-7B",
+    "qwen2-5-vl-7b": "Qwen2.5-VL-7B",
+    "qwen3-vl-8b": "Qwen3-VL-8B",
+    "intern-vl-3-5": "InternVL3.5",
+    "intern-vl-3": "InternVL3",
+    "intern-vl": "InternVL",
+    "qwen3-vl-2b": "Qwen3-VL-2B",
+    "qwen3-vl-4b": "Qwen3-VL-4B",
+    "qwen3-vl-32b": "Qwen3-VL-32B",
+    "gemma-4-e4b": "Gemma4-E4B",
+    "molmo-7b": "Molmo-7B",
 }
 
 MARKERS = ["o", "s", "^", "D", "v", "P", "X", "*"]
 
-_INT_RE    = re.compile(r"^\d+$")
+_INT_RE = re.compile(r"^\d+$")
 _SWAP_GT_RE = re.compile(r"^\(\s*(\d+)\s*,\s*(\d+)\s*\)$")
-_PAIR_RE   = re.compile(r"^(\d+)\s*,\s*(\d+)$")
+_PAIR_RE = re.compile(r"^(\d+)\s*,\s*(\d+)$")
 
 
 def load_binary(path: str) -> list[dict]:
@@ -67,7 +68,12 @@ def load_corrupt_localize(path: str) -> list[dict]:
             a = _INT_RE.match(r["answer"].strip())
             if not g or not a:
                 continue
-            rows.append({"seq_len": int(r["seq_len"]), "correct": int(a.group()) == int(g.group()) + 1})
+            rows.append(
+                {
+                    "seq_len": int(r["seq_len"]),
+                    "correct": int(a.group()) == int(g.group()) + 1,
+                }
+            )
     return rows
 
 
@@ -75,21 +81,28 @@ def load_swap_localize(path: str) -> list[dict]:
     rows = []
     with open(path, newline="") as f:
         for r in csv.DictReader(f):
-            gm = _SWAP_GT_RE.match(r["ground_truth"].strip()) or _PAIR_RE.match(r["ground_truth"].strip())
+            gm = _SWAP_GT_RE.match(r["ground_truth"].strip()) or _PAIR_RE.match(
+                r["ground_truth"].strip()
+            )
             am = _PAIR_RE.match(r["answer"].strip())
             if not gm or not am:
                 continue
-            gt  = (int(gm.group(1)) + 1, int(gm.group(2)) + 1)
+            gt = (int(gm.group(1)) + 1, int(gm.group(2)) + 1)
             ans = (int(am.group(1)), int(am.group(2)))
-            rows.append({"seq_len": int(r["seq_len"]), "correct": ans == gt or ans == (gt[1], gt[0])})
+            rows.append(
+                {
+                    "seq_len": int(r["seq_len"]),
+                    "correct": ans == gt or ans == (gt[1], gt[0]),
+                }
+            )
     return rows
 
 
 LOADERS = {
-    "corrupt_detect":   load_binary,
-    "swap_detect":      load_binary,
+    "corrupt_detect": load_binary,
+    "swap_detect": load_binary,
     "corrupt_localize": load_corrupt_localize,
-    "swap_localize":    load_swap_localize,
+    "swap_localize": load_swap_localize,
 }
 
 
@@ -146,21 +159,38 @@ def main(result_dirs: list[str]) -> None:
                     ys.append(sum(bucket) / len(bucket) * 100)
             if not xs:
                 continue
-            ax.plot(xs, ys,
-                    label=model,
-                    color=MODEL_PALETTE[i % len(MODEL_PALETTE)],
-                    marker=MARKERS[i % len(MARKERS)],
-                    linewidth=1.8, markersize=5)
+            ax.plot(
+                xs,
+                ys,
+                label=model,
+                color=MODEL_PALETTE[i % len(MODEL_PALETTE)],
+                marker=MARKERS[i % len(MARKERS)],
+                linewidth=1.8,
+                markersize=5,
+            )
 
         if task in ("corrupt_detect", "swap_detect"):
-            ax.axhline(50, color=CHANCE_COLOR, linestyle="--", linewidth=1, label="random chance")
+            ax.axhline(
+                50,
+                color=CHANCE_COLOR,
+                linestyle="--",
+                linewidth=1,
+                label="random chance",
+            )
         else:
             cxs = all_lens
             if task == "corrupt_localize":
                 cys = [100.0 / l for l in cxs]
             else:
                 cys = [100.0 / (l - 1) if l > 1 else 0.0 for l in cxs]
-            ax.plot(cxs, cys, color=CHANCE_COLOR, linestyle="--", linewidth=1, label="random chance")
+            ax.plot(
+                cxs,
+                cys,
+                color=CHANCE_COLOR,
+                linestyle="--",
+                linewidth=1,
+                label="random chance",
+            )
 
         ax.set_title(TASK_LABELS[task], fontsize=13, fontweight="bold")
         ax.set_xlabel("Sequence length", fontsize=13)
@@ -176,10 +206,15 @@ def main(result_dirs: list[str]) -> None:
     # Shared legend below the figure (exclude per-task chance duplicate labels)
     handles, labels = axes[0].get_legend_handles_labels()
     ncols = min(len(all_models) + 1, 6)
-    fig.legend(handles, labels,
-               loc="lower center", ncol=ncols,
-               fontsize=12, frameon=False,
-               bbox_to_anchor=(0.5, 0.05))
+    fig.legend(
+        handles,
+        labels,
+        loc="lower center",
+        ncol=ncols,
+        fontsize=12,
+        frameon=False,
+        bbox_to_anchor=(0.5, 0.05),
+    )
     fig.tight_layout(rect=[0, 0.12, 1, 1])
 
     out = os.path.join(BASE, "figures", "craft_combined_by_length.png")

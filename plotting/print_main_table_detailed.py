@@ -21,12 +21,12 @@ from pathlib import Path
 
 DATASETS    = ["clevrer", "craft", "drive-lm", "mtl-aqa"]
 DS_ABBREV   = {"clevrer": "CL", "craft": "CR", "drive-lm": "DR", "mtl-aqa": "MT"}
-TASKS       = ["corrupt_detect", "corrupt_localize", "swap_detect", "swap_localize"]
+TASKS       = ["swap_detect", "swap_localize", "corrupt_detect", "corrupt_localize"]
 TASK_LABELS = {
-    "corrupt_detect":   "corrupt\\_detect",
-    "corrupt_localize": "corrupt\\_localize",
-    "swap_detect":      "swap\\_detect",
-    "swap_localize":    "swap\\_localize",
+    "corrupt_detect":   "Frame Detect",
+    "corrupt_localize": "Frame Localize",
+    "swap_detect":      "Temporal Detect",
+    "swap_localize":    "Temporal Localize",
 }
 
 # annotation file naming: (task, dataset) -> filename stem
@@ -56,11 +56,11 @@ MODEL_NAMES: dict[str, str] = {
     "gemma-4-e4b":    "Gemma-4-E4B",
 }
 MODEL_ORDER = [
-    "qwen2-5-vl-7b", "qwen3-vl-8b", "intern-vl-3-5", "gemma-4-e4b",
-    "molmo-7b", "intern-vl-3", "intern-vl",
+    "qwen2-5-vl-7b", "qwen3-vl-8b", "gemma-4-e4b",
+    "intern-vl-3", "intern-vl-3-5", "molmo-7b", "intern-vl",
     "qwen3-vl-2b", "qwen3-vl-4b", "qwen3-vl-32b",
 ]
-EXCLUDE = {"qwen3-vl-8b-thinking", "qwen3-vl-8b-video", "no-scene-desc", "prompt-ablation", "thinking-ablation"}
+INCLUDE = {"qwen2-5-vl-7b", "qwen3-vl-8b", "gemma-4-e4b", "intern-vl-3", "intern-vl-3-5"}
 
 # ---------------------------------------------------------------------------
 # Accuracy helpers  (identical logic to print_main_table.py)
@@ -284,8 +284,8 @@ def print_latex(
     n_ds    = len(DATASETS)
     abbrevs = [DS_ABBREV[ds] for ds in DATASETS]
 
-    col_spec = "l" + "".join(" " + "c" * n_ds for _ in TASKS)
-    print(r"\begin{table*}[ht!]")
+    col_spec = "l" + "".join(" cccc" for _ in TASKS)
+    print(r"\begin{table*}[t!]")
     print(r"    \centering")
     print(r"    \setlength{\tabcolsep}{4pt}")
     print(r"    \small")
@@ -293,8 +293,8 @@ def print_latex(
     print(r"    \toprule")
 
     # task group headers with cmidrule
-    col_idx = 2  # 1-indexed, first data col is 2
-    task_header = "    Model"
+    col_idx = 2
+    task_header = "    "
     rules = []
     for task in TASKS:
         task_header += rf" & \multicolumn{{{n_ds}}}{{c}}{{{TASK_LABELS[task]}}}"
@@ -311,6 +311,14 @@ def print_latex(
     print(sub + r" \\")
     print(r"    \midrule")
 
+    # Random / chance row
+    chance_line = r"     Random"
+    for task in TASKS:
+        for ds in DATASETS:
+            chance_line += f" & {chance[(task, ds)]:.1f}"
+    print(chance_line + r" \\")
+    print(r"     \midrule")
+
     for name, cells in rows:
         line = f"    {name}"
         for task in TASKS:
@@ -320,29 +328,24 @@ def print_latex(
                 line += " & " + _fmt(v, bold)
         print(line + r" \\")
 
-    print(r"    \midrule")
-
-    # Human row
-    human_line = r"    Human$^\dagger$"
+    # Human row (commented out)
+    human_line = r"    %Human$^\dagger$"
     for task in TASKS:
         for ds in DATASETS:
             v = human.get((task, ds))
             human_line += " & " + (f"{v:.1f}" if v is not None else "—")
+    print(r"    %\midrule")
     print(human_line + r" \\")
 
-    # Chance row
-    chance_line = "    Chance"
-    for task in TASKS:
-        for ds in DATASETS:
-            chance_line += f" & {chance[(task, ds)]:.1f}"
-    print(chance_line + r" \\")
-
+    print(r"   ")
     print(r"    \bottomrule")
     print(r"    \end{tabular}")
-    print(r"    \caption{Per-dataset detection and localization accuracy (\%)."
-          r" CL\,=\,clevrer, CR\,=\,craft, DR\,=\,drive-lm, MT\,=\,mtl-aqa."
-          r" $^\dagger$Human performance evaluated on swap tasks only."
-          r" \textbf{Bold} indicates best model per column.}")
+    print(r"    \caption{Detection and localization accuracy (\%) across datasets."
+          r" Models perform substantially better on frame-level anomaly tasks than on temporal"
+          r" anomaly tasks. While frame-level anomalies are detected reliably and localized above"
+          r" chance, temporal anomaly detection remains near chance and temporal anomaly"
+          r" localization only modestly exceeds chance levels."
+          r" CL: CLEVRER, CR: CRAFT, DR: DriveLM, MT: MTL-AQA.}")
     print(r"    \label{tab:detailed_results}")
     print(r"\end{table*}")
 
@@ -358,7 +361,7 @@ def main() -> None:
     args = parser.parse_args()
 
     root   = Path(args.root).resolve()
-    models = [m for m in discover_models(root) if m not in EXCLUDE]
+    models = [m for m in discover_models(root) if m in INCLUDE]
     if not models:
         sys.exit("No model directories found in results/.")
 

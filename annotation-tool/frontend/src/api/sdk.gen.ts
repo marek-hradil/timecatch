@@ -2,7 +2,7 @@
 
 import type { Client, Options as Options2, RequestResult, TDataShape } from './client';
 import { client } from './client.gen';
-import type { AnnotateApiAnnotatePostData, AnnotateApiAnnotatePostErrors, AnnotateApiAnnotatePostResponses, CreateSessionApiSessionPostData, CreateSessionApiSessionPostErrors, CreateSessionApiSessionPostResponses } from './types.gen';
+import type { AnnotateApiAnnotatePostData, AnnotateApiAnnotatePostErrors, AnnotateApiAnnotatePostResponses, CreateSessionApiSessionPostData, CreateSessionApiSessionPostErrors, CreateSessionApiSessionPostResponses, SessionMetricsApiSessionMetricsPostData, SessionMetricsApiSessionMetricsPostResponses } from './types.gen';
 
 export type Options<TData extends TDataShape = TDataShape, ThrowOnError extends boolean = boolean, TResponse = unknown> = Options2<TData, ThrowOnError, TResponse> & {
     /**
@@ -23,6 +23,18 @@ export type Options<TData extends TDataShape = TDataShape, ThrowOnError extends 
  */
 export const createSessionApiSessionPost = <ThrowOnError extends boolean = false>(options: Options<CreateSessionApiSessionPostData, ThrowOnError>): RequestResult<CreateSessionApiSessionPostResponses, CreateSessionApiSessionPostErrors, ThrowOnError> => (options.client ?? client).post<CreateSessionApiSessionPostResponses, CreateSessionApiSessionPostErrors, ThrowOnError>({
     url: '/api/session',
+    ...options,
+    headers: {
+        'Content-Type': 'application/json',
+        ...options.headers
+    }
+});
+
+/**
+ * Session Metrics
+ */
+export const sessionMetricsApiSessionMetricsPost = <ThrowOnError extends boolean = false>(options: Options<SessionMetricsApiSessionMetricsPostData, ThrowOnError>): RequestResult<SessionMetricsApiSessionMetricsPostResponses, never, ThrowOnError> => (options.client ?? client).post<SessionMetricsApiSessionMetricsPostResponses, never, ThrowOnError>({
+    url: '/api/session/metrics',
     ...options,
     headers: {
         'Content-Type': 'application/json',

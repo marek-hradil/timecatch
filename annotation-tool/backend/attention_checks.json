@@ -1,0 +1,42 @@
+{
+  "MTL-AQA_detect": [
+    {"sample_name": "scene_26_125", "swap_pair": [1, 2]},
+    {"sample_name": "scene_26_03",  "swap_pair": null},
+    {"sample_name": "scene_18_23",  "swap_pair": [0, 1]}
+  ],
+  "MTL-AQA_localize": [
+    {"sample_name": "scene_26_125", "swap_pair": [1, 2]},
+    {"sample_name": "scene_26_03",  "swap_pair": [2, 3]},
+    {"sample_name": "scene_18_23",  "swap_pair": [0, 1]}
+  ],
+  "drive_lm_detect": [
+    {"sample_name": "scene_400", "swap_pair": [1, 2]},
+    {"sample_name": "scene_456", "swap_pair": null},
+    {"sample_name": "scene_498", "swap_pair": [0, 1]}
+  ],
+  "drive_lm_localize": [
+    {"sample_name": "scene_400", "swap_pair": [1, 2]},
+    {"sample_name": "scene_456", "swap_pair": [2, 3]},
+    {"sample_name": "scene_498", "swap_pair": [0, 1]}
+  ],
+  "CRAFT_detect": [
+    {"sample_name": "scene_3_001422", "swap_pair": [1, 2]},
+    {"sample_name": "scene_4_001602", "swap_pair": null},
+    {"sample_name": "scene_5_002014", "swap_pair": [0, 1]}
+  ],
+  "CRAFT_localize": [
+    {"sample_name": "scene_3_001422", "swap_pair": [1, 2]},
+    {"sample_name": "scene_4_001602", "swap_pair": [5, 6]},
+    {"sample_name": "scene_5_002014", "swap_pair": [0, 1]}
+  ],
+  "CLEVRER_detect": [
+    {"sample_name": "scene_10967", "swap_pair": [0, 1]},
+    {"sample_name": "scene_10996", "swap_pair": null},
+    {"sample_name": "scene_11019", "swap_pair": [0, 1]}
+  ],
+  "CLEVRER_localize": [
+    {"sample_name": "scene_10967", "swap_pair": [0, 1]},
+    {"sample_name": "scene_10996", "swap_pair": [0, 1]},
+    {"sample_name": "scene_11019", "swap_pair": [0, 1]}
+  ]
+}

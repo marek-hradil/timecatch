@@ -39,6 +39,7 @@ VALID_DATASETS = set(DATASET_CONFIGS.keys())
 VALID_TASKS = {"detect", "localize"}
 
 SAMPLES_PER_PARTICIPANT: int = int(os.environ.get("SAMPLES_PER_PARTICIPANT", "15"))
+N_ATTENTION_CHECKS: int = int(os.environ.get("N_ATTENTION_CHECKS", "3"))
 
 # When set, frame URLs point directly at GCS instead of going through /frames
 GCS_PUBLIC_BASE = os.environ.get("GCS_PUBLIC_BASE", "")

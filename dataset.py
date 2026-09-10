@@ -12,6 +12,7 @@ class Scenario:
     name: str
     frames: list[PILImage.Image]
     scene_description: str | None = None
+    paths: list[str] | None = None
 
 
 @dataclass
@@ -20,6 +21,7 @@ class BinaryScenario:
     frames: list[PILImage.Image]
     anomaly: bool
     scene_description: str | None = None
+    paths: list[str] | None = None
 
 
 @dataclass
@@ -114,11 +116,46 @@ class Dataset:
             name=name,
             frames=[PILImage.open(p).copy() for p in paths],
             scene_description=scene_description,
+            paths=list(paths),
         )
 
     def sample(self, n: int | None = None) -> list[Scenario]:
         rng = random.Random(self.seed)
         return [self._load(name, paths, desc) for name, paths, desc in self._select(n, rng)]
+
+    def entry_by_name(self, name: str) -> "_Entry | None":
+        for entry in self._index:
+            if entry[0] == name:
+                return entry
+        return None
+
+    def load_explicit_stimulus(
+        self,
+        name: str,
+        shown_order: list[int],
+        ground_truth: "bool | list[int] | tuple[int, int]",
+    ) -> "BinaryScenario | PositionScenario":
+        """Load a scene and reorder frames to match the exact shown order.
+
+        Args:
+            name: scene name (e.g. "scene_2_000590")
+            shown_order: list of original frame indices in the order shown to
+                         the annotator (e.g. [0, 1, 3, 2] for a swap at (2,3))
+            ground_truth: bool for detect task, (i, j) tuple/list for localize
+        """
+        entry = self.entry_by_name(name)
+        if entry is None:
+            raise KeyError(f"Scene {name!r} not found in dataset index")
+        _, paths, desc = entry
+        # Map original frame index → path (handles any indexing scheme)
+        stem_to_path = {int(Path(p).stem): p for p in paths}
+        ordered_paths = [stem_to_path[idx] for idx in shown_order]
+        frames = [PILImage.open(p).copy() for p in ordered_paths]
+        if isinstance(ground_truth, bool):
+            return BinaryScenario(name=name, frames=frames, anomaly=ground_truth, scene_description=desc, paths=ordered_paths)
+        else:
+            gt = tuple(ground_truth)
+            return PositionScenario(name=name, frames=frames, position=(gt[0], gt[1]), scene_description=desc)
 
 
 class SwapDataset:
@@ -126,28 +163,34 @@ class SwapDataset:
         self._dataset = dataset
         self._seed = dataset.seed
 
-    def _swap(self, frames: list[PILImage.Image], rng: random.Random) -> tuple[list[PILImage.Image], tuple[int, int]]:
+    def _swap(
+        self, frames: list[PILImage.Image], paths: list[str] | None, rng: random.Random
+    ) -> tuple[list[PILImage.Image], list[str] | None, tuple[int, int]]:
         frames = list(frames)
+        paths = list(paths) if paths is not None else None
         i = rng.randrange(len(frames) - 1)
         frames[i], frames[i + 1] = frames[i + 1], frames[i]
-        return frames, (i, i + 1)
+        if paths is not None:
+            paths[i], paths[i + 1] = paths[i + 1], paths[i]
+        return frames, paths, (i, i + 1)
 
     def sample_binary(self, n: int | None = None) -> list[BinaryScenario]:
         rng = random.Random(self._seed)
         result = []
         for s in self._dataset.sample(n):
             if rng.random() < 0.5:
-                frames, _ = self._swap(s.frames, rng)
-                result.append(BinaryScenario(name=s.name, frames=frames, anomaly=True, scene_description=s.scene_description))
+                frames, paths, _ = self._swap(s.frames, s.paths, rng)
+                result.append(BinaryScenario(name=s.name, frames=frames, anomaly=True, scene_description=s.scene_description, paths=paths))
             else:
-                result.append(BinaryScenario(name=s.name, frames=list(s.frames), anomaly=False, scene_description=s.scene_description))
+                paths = list(s.paths) if s.paths is not None else None
+                result.append(BinaryScenario(name=s.name, frames=list(s.frames), anomaly=False, scene_description=s.scene_description, paths=paths))
         return result
 
     def sample_position(self, n: int | None = None) -> list[PositionScenario]:
         rng = random.Random(self._seed)
         result = []
         for s in self._dataset.sample(n):
-            frames, position = self._swap(s.frames, rng)
+            frames, _, position = self._swap(s.frames, s.paths, rng)
             result.append(PositionScenario(name=s.name, frames=frames, position=position, scene_description=s.scene_description))
         return result
 

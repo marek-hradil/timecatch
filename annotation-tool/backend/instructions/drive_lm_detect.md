@@ -1,16 +1,20 @@
 ## Introduction
 
-We are conducting a study about whether AI systems can understand time in videos. Concretely: if you show AI a sequence of images from a video, can it tell if the images are in the right order? To answer this, we also need to know how well humans perform the same task.
+We are conducting a study about how AI systems reason about the order of events in videos. Concretely: if you show AI a sequence of images from a video, can it tell if the images are in the right order? To answer this, we also need to know how well humans perform the same task.
 
 You will be given series of four to eight **snapshots** from a video. The **goal** is to **evaluate** how well humans can detect if a swap happened in the sequence. This data will then be used to compare against how well AI performs. No other data than the annotations is collected (no personal data, location data, etc.).
 
 ## Your Task
 
-You will interact with a dataset of real dashcam-style driving footage — camera views from a car driving through real streets.
+You will interact with a dataset of real dashcam-style driving footage — camera views from a car driving through real streets. Play the clip below to get a feel for how the dataset looks — since AI models perceive video as a series of still images rather than motion, we will work with individual snapshots rather than the video itself.
+
+![Example clip from the dataset](https://storage.googleapis.com/lamp-annotation-datasets/introductions/drive-lm-example.mp4)
 
 You will be given a sequence where two **consecutive** images **may have been** swapped. Inspect the sequence and use the buttons to select whether the sequence was modified with a swap, or is still in the correct order.
 
 ![Example of the user interface](https://storage.googleapis.com/lamp-annotation-datasets/introductions/drive-lm-detect.png)
+
+**Answer:** Not in the correct order — frames 3 and 4 are swapped.
 
 **Tip:** Click any image to open a full-size viewer and use the **← →** arrow keys (or the on-screen buttons) to flip between frames one at a time — this makes it much easier to spot a swap.
 

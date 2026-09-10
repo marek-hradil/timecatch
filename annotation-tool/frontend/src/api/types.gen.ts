@@ -28,6 +28,18 @@ export type AnnotateRequest = {
      * Human Answer
      */
     human_answer: boolean | Array<number>;
+    /**
+     * Scene Id
+     */
+    scene_id?: string;
+    /**
+     * View Duration S
+     */
+    view_duration_s?: number | null;
+    /**
+     * Viewer Opens
+     */
+    viewer_opens?: number | null;
 };
 
 /**
@@ -104,6 +116,52 @@ export type SessionRequest = {
      * Task
      */
     task: string;
+    /**
+     * Scene Id
+     */
+    scene_id?: string;
+    /**
+     * Study Id
+     */
+    study_id?: string | null;
+    /**
+     * Session Id
+     */
+    session_id?: string | null;
+};
+
+/**
+ * SessionMetricsRequest
+ */
+export type SessionMetricsRequest = {
+    /**
+     * Prolific Pid
+     */
+    prolific_pid: string;
+    /**
+     * Dataset
+     */
+    dataset: string;
+    /**
+     * Task
+     */
+    task: string;
+    /**
+     * Scene Id
+     */
+    scene_id?: string;
+    /**
+     * Instructions Duration S
+     */
+    instructions_duration_s?: number | null;
+    /**
+     * Instructions Lightbox Opens
+     */
+    instructions_lightbox_opens?: number | null;
+    /**
+     * Video Played
+     */
+    video_played?: boolean | null;
 };
 
 /**
@@ -192,6 +250,19 @@ export type CreateSessionApiSessionPostResponses = {
 };
 
 export type CreateSessionApiSessionPostResponse = CreateSessionApiSessionPostResponses[keyof CreateSessionApiSessionPostResponses];
+
+export type SessionMetricsApiSessionMetricsPostData = {
+    body: SessionMetricsRequest;
+    path?: never;
+    query?: never;
+    url: '/api/session/metrics';
+};
+
+export type SessionMetricsApiSessionMetricsPostResponses = {
+    200: { ok: boolean };
+};
+
+export type SessionMetricsApiSessionMetricsPostResponse = SessionMetricsApiSessionMetricsPostResponses[keyof SessionMetricsApiSessionMetricsPostResponses];
 
 export type AnnotateApiAnnotatePostData = {
     body: AnnotateRequest;

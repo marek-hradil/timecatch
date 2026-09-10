@@ -14,9 +14,8 @@ COPY annotation-tool/frontend ./frontend
 RUN apt-get update && apt-get install -y nodejs npm && rm -rf /var/lib/apt/lists/*
 RUN cd frontend && npm ci && npm run build
 
-# Copy backend, assets, and parent dataset module
+# Copy backend and parent dataset module
 COPY annotation-tool/backend ./backend
-COPY annotation-tool/introductions ./introductions
 COPY dataset.py ./dataset.py
 
 # Datasets are mounted at runtime via Cloud Storage FUSE volume mount

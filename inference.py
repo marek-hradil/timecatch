@@ -4,6 +4,7 @@ import numpy as np
 from PIL import Image as PILImage
 from transformers import AutoProcessor
 from vllm import LLM, SamplingParams
+from vllm.lora.request import LoRARequest
 from vllm.sampling_params import StructuredOutputsParams
 
 
@@ -31,6 +32,10 @@ class Model:
         max_model_len: int | None = None,
         max_image_size: int | None = None,
         thinking: bool = False,
+        enforce_eager: bool = False,
+        lora_path: str | None = None,
+        lora_rank: int = 16,
+        multi_lora: bool = False,
     ):
         self._video_mode = video_mode
         self._max_image_size = max_image_size
@@ -45,6 +50,19 @@ class Model:
             extra_kwargs["max_model_len"] = 32768
         elif max_model_len is not None:
             extra_kwargs["max_model_len"] = max_model_len
+        if enforce_eager:
+            extra_kwargs["enforce_eager"] = True
+        self._lora_request = None
+        self._next_lora_id = 1
+        # multi_lora=True enables the vLLM LoRA runtime without pinning a single
+        # adapter, so ask_batch(..., lora_path=...) can swap adapters per call
+        # against one running model instead of reloading the base model per checkpoint.
+        if lora_path is not None or multi_lora:
+            extra_kwargs["enable_lora"] = True
+            extra_kwargs["max_lora_rank"] = lora_rank
+        if lora_path is not None:
+            self._lora_request = LoRARequest("adapter", self._next_lora_id, lora_path)
+            self._next_lora_id += 1
         self.llm = LLM(
             model=model_id,
             tensor_parallel_size=tensor_parallel_size,
@@ -151,10 +169,16 @@ class Model:
         )
         return {"prompt": prompt, "multi_modal_data": {"image": images}}
 
-    def ask(self, images: list[PILImage.Image], system_prompt: str, user_text: str | None = None, pattern: str | None = None) -> str:
-        return self.ask_batch([(images, system_prompt, user_text)], pattern=pattern)[0]
+    def ask(self, images: list[PILImage.Image], system_prompt: str, user_text: str | None = None, pattern: str | None = None, lora_path: str | None = None) -> str:
+        return self.ask_batch([(images, system_prompt, user_text)], pattern=pattern, lora_path=lora_path)[0]
 
-    def ask_batch(self, requests: list[tuple[list[PILImage.Image], str, str | None]], pattern: str | None = None) -> list[str]:
+    def ask_batch(self, requests: list[tuple[list[PILImage.Image], str, str | None]], pattern: str | None = None, lora_path: str | None = None) -> list[str]:
+        # Per-call override — lets one running model (built with multi_lora=True)
+        # swap adapters between calls instead of reloading per checkpoint.
+        lora_request = self._lora_request
+        if lora_path is not None:
+            lora_request = LoRARequest(f"adapter-{self._next_lora_id}", self._next_lora_id, lora_path)
+            self._next_lora_id += 1
         # Thinking models generate freely — constrained sampling blocks reasoning.
         # Use a high max_tokens budget so the model can finish its chain-of-thought.
         if self._thinking:
@@ -164,6 +188,6 @@ class Model:
         else:
             sampling_params = None
         inputs = [self._prompt(self._messages(imgs, sp, user_text), imgs) for imgs, sp, user_text in requests]
-        outputs = self.llm.generate(inputs, sampling_params=sampling_params)
+        outputs = self.llm.generate(inputs, sampling_params=sampling_params, lora_request=lora_request)
         postprocess = _extract_yesno if self._thinking else _strip_think
         return [postprocess(out.outputs[0].text) for out in outputs]

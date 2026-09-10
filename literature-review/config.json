@@ -1,0 +1,131 @@
+{
+  "min_year": 2023,
+  "seeds": [
+    {
+      "title": "TOMATO: Assessing Visual Temporal Reasoning Capabilities in Multimodal Foundation Models",
+      "arxiv_id": "2410.23266",
+      "note": "Ordering benchmark, ICLR 2025"
+    },
+    {
+      "title": "TVBench: Redesigning Large-Scale Video Understanding Benchmarks",
+      "arxiv_id": "2410.07752",
+      "note": "Order-invariance critique (v1 titled 'Lost in Time'), 2025"
+    },
+    {
+      "title": "TempCompass: Do Video LLMs Really Understand Videos?",
+      "arxiv_id": "2403.00476",
+      "note": "Temporal QA benchmark, ACL 2024"
+    },
+    {
+      "title": "Burn After Reading: Do Multimodal Large Language Models Truly Capture Order of Events in Image Sequences?",
+      "arxiv_id": "2506.10415",
+      "note": "TempVS benchmark, Song et al. 2025"
+    },
+    {
+      "title": "Vinoground: Scrutinizing LMMs over Dense Temporal Reasoning with Short Videos",
+      "arxiv_id": "2410.02763",
+      "note": "Discriminative temporal benchmark, 2024"
+    },
+    {
+      "title": "A Shortcut-aware Video-QA Benchmark for Physical Understanding via Minimal Video Pairs",
+      "arxiv_id": "2506.09987",
+      "note": "MVP benchmark, Krojer et al. 2025"
+    },
+    {
+      "title": "Time Blindness: Why Video-Language Models Can't See What Humans Can?",
+      "arxiv_id": "2505.24867",
+      "note": "SpookyBench, CVPR 2026"
+    },
+    {
+      "title": "Mementos: A Comprehensive Benchmark for Multimodal Large Language Model Reasoning over Image Sequences",
+      "arxiv_id": "2401.10529",
+      "note": "Temporal QA, 2024"
+    },
+    {
+      "title": "TGIF-QA: Toward Spatio-Temporal Reasoning in Visual Question Answering",
+      "arxiv_id": "1704.04497",
+      "note": "Classic temporal QA baseline"
+    },
+    {
+      "title": "TimeBlind: A Spatio-Temporal Compositionality Benchmark for Video LLMs",
+      "arxiv_id": "2602.00288",
+      "note": "Spatio-temporal compositionality benchmark, 2026"
+    },
+    {
+      "title": "Chronological Blindness: Benchmarking Temporal Reasoning in Vision-Language Models with CHRONOSIGHT",
+      "arxiv_id": "2606.16334",
+      "note": "Temporal outlier detection benchmark, 2026"
+    },
+    {
+      "title": "Moment-Video: Diagnosing Temporal Fidelity of Video MLLMs on Momentary Visual Events",
+      "arxiv_id": "2606.02522",
+      "note": "Momentary-event fidelity diagnostic, 2026"
+    },
+    {
+      "title": "Video-MME-Logical: A Controlled Diagnostic Benchmark for Video Temporal-Logical Reasoning",
+      "arxiv_id": "2606.27828",
+      "note": "Temporal-logical reasoning benchmark, 2026"
+    },
+    {
+      "title": "CaST-Bench: Benchmarking Causal Chain-Grounded Spatio-Temporal Reasoning for Video Question Answering",
+      "arxiv_id": "2605.23216",
+      "note": "Causal chain-grounded reasoning benchmark, 2026"
+    },
+    {
+      "title": "What Does a Temporal Benchmark Score Measure? Decomposing Channel Use in Video VLM Evaluation",
+      "arxiv_id": "2607.12304",
+      "note": "RoPE-vs-pixels channel decomposition, 2026"
+    },
+    {
+      "title": "TempCore: Are Video QA Benchmarks Temporally Grounded? A Frame Selection Sensitivity Analysis and Benchmark",
+      "arxiv_id": "2509.01167",
+      "note": "Frame selection sensitivity diagnostic, 2025"
+    },
+    {
+      "title": "CircuitProbe: Tracing Visual Temporal Evidence Flow in Video Language Models",
+      "arxiv_id": "2507.19420",
+      "note": "Mechanistic circuit-level analysis, 2025"
+    },
+    {
+      "title": "Seeing the Arrow of Time in Large Multimodal Models",
+      "arxiv_id": "2506.03340",
+      "note": "AoTBench / ArrowRL (Xue et al.), 2025/26"
+    }
+  ],
+  "arxiv_queries": [
+    "(all:\"temporal reasoning\" OR all:\"temporal grounding\" OR all:\"temporal consistency\" OR all:\"frame order\" OR all:\"event order\") AND (all:\"vision-language\" OR all:\"video LLM\" OR all:\"video-language\" OR all:\"multimodal large\" OR all:VLM OR all:MLLM)",
+    "cat:cs.CV AND (all:\"temporal benchmark\" OR all:\"video understanding benchmark\") AND all:multimodal",
+    "cat:cs.CL AND (all:\"temporal\" OR all:\"ordering\") AND (all:\"video language model\" OR all:\"multimodal\")"
+  ],
+  "arxiv_max_results_per_query": 150,
+  "relevance_keywords": {
+    "temporal": [
+      "temporal",
+      "time",
+      "chronolog",
+      "ordering",
+      "order sensitivity",
+      "sequence order",
+      "frame order",
+      "event order",
+      "before/after"
+    ],
+    "vision": [
+      "vision-language",
+      "video",
+      "vlm",
+      "mllm",
+      "multimodal",
+      "video-llm",
+      "video lm",
+      "large language model"
+    ],
+    "eval": [
+      "benchmark",
+      "evaluation",
+      "probe",
+      "diagnostic",
+      "anomaly"
+    ]
+  }
+}

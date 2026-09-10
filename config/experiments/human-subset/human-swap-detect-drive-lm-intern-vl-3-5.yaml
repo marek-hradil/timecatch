@@ -1,0 +1,15 @@
+model: intern-vl-3-5
+dataset: drive-lm
+seed: 42
+script: scripts/human_swap_detect
+batch_size: 64
+human_manifest: human_subset/swap_detect_drive-lm.json
+
+slurm:
+  qos: acc_ehpc
+  time: "00:30:00"
+  gpus: 1
+  cpus_per_gpu: 20
+
+system_prompt: >
+  You are given a sequence of images showing a scene unfolding over time. The frames should appear in a natural temporal order, but two consecutive frames may have been swapped. Reply with only 'yes' if you detect a swap, or 'no' if the order looks correct.
