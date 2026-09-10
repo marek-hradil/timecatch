@@ -1,0 +1,13 @@
+name: qwen3-vl-2b-lora-swap-detect-clevrer
+path: Qwen/Qwen3-VL-2B-Instruct
+tensor_parallel_size: 1
+lora_rank: 8
+# v4-20260731-233614 (retrain, identical config/seed to v3 above) — checkpoint
+# sweep against the real held-out CLEVRER set showed a genuine climb to
+# swap_acc=0.967 by the final step, confirmed via two independent code paths
+# (checkpoint_sweep.py's multi-adapter path and scripts/verify_checkpoint.py's
+# single-adapter path: 94.0% on a 200-example subset, matching closely).
+# v3's checkpoint-650 scored only 51.1% on the same held-out set despite
+# identical seed/config — most likely GPU training non-determinism causing
+# divergent LoRA solutions between runs (not yet fully explained).
+lora_path: checkpoints/qwen3-vl-2b-lora-swap-detect-clevrer/v4-20260731-233614/checkpoint-714

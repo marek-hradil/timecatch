@@ -9,13 +9,18 @@ wheels/
 # Virtual environments
 .venv
 .venv-finetune
-models/
-datasets/
-failures/
+
+# Root-level data/artifact dirs -- anchored with a leading slash so these don't
+# also match same-named subdirectories (config/models/, config/datasets/ were
+# being silently swallowed by the old bare "models/"/"datasets/" rules and had
+# never been tracked as a result).
+/models/
+/datasets/
+/failures/
+/logs/
+/outputs/
+/checkpoints/
 annotation-tool/annotations/
-logs/
-outputs/
-checkpoints/
 
 # User-specific cluster config
 cluster/env.sh
@@ -26,3 +31,10 @@ cluster/wheels*/
 cluster/hf_cache/
 annotation-tool/introductions
 annotation-tool/.venv
+
+# macOS
+.DS_Store
+**/.DS_Store
+
+# Secrets
+.env

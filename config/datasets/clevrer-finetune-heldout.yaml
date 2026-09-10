@@ -1,0 +1,5 @@
+name: clevrer-finetune-heldout
+path: datasets/CLEVRER
+manifest: scenes_finetune_heldout.json
+seq_len_min: 4
+seq_len_max: 8

@@ -1,0 +1,4 @@
+name: qwen3-vl-32b
+path: Qwen/Qwen3-VL-32B-Instruct
+tensor_parallel_size: 2
+max_model_len: 32768

@@ -1,0 +1,5 @@
+name: drive-lm
+path: datasets/drive_lm
+manifest: scenes_filtered.json
+seq_len_min: 4
+seq_len_max: 8

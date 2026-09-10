@@ -1,0 +1,4 @@
+name: intern-vl-3-5
+path: OpenGVLab/InternVL3_5-8B
+tensor_parallel_size: 1
+enforce_eager: true

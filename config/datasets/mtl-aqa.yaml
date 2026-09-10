@@ -1,0 +1,5 @@
+name: mtl-aqa
+path: datasets/MTL-AQA
+manifest: scenes_filtered.json
+seq_len_min: 4
+seq_len_max: 8

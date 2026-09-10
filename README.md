@@ -195,6 +195,7 @@ All figures are regenerated from the CSVs in `results/`:
 | `fig:dataset-histograms` — sequence length distributions | `plotting/plot_dataset_lengths.py` |
 | `tab:dataset_stats_1` — dataset statistics | `scripts/print_dataset_stats_table.py` |
 | `tab:detailed_results` — main results | `plotting/print_main_table_detailed.py` |
+| `tab:detailed_results_ci` — main results with Wilson CIs (App. D) | `plotting/print_main_table_ci.py` |
 | `fig:model-failure` — MTL-AQA localization failure | `scripts/render_scene_figure.py` |
 | `fig:human_results` — human vs. model gap | `plotting/plot_human_model_gap.py`, `plotting/print_human_comparison.py` |
 | `fig:visual-similarity` — LPIPS bins, Qwen3-VL-8B | `plotting/plot_lpips_bins.py` |

@@ -1,0 +1,4 @@
+name: qwen3-vl-8b-thinking
+path: Qwen/Qwen3-VL-8B-Thinking
+tensor_parallel_size: 1
+thinking: true

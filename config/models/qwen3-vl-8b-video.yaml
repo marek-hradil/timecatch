@@ -1,0 +1,4 @@
+name: qwen3-vl-8b-video
+path: Qwen/Qwen3-VL-8B-Instruct
+tensor_parallel_size: 1
+video_mode: true
