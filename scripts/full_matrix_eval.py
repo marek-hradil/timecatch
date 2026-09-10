@@ -23,7 +23,9 @@ from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).parent.parent))
 from dataset import Dataset, SwapDataset
-from inference import Model
+from inference import Model, Prompt, build_messages
+
+MODEL_ID = "Qwen/Qwen3-VL-2B-Instruct"
 
 SWAP_PROMPT = (
     "You are given a sequence of images showing a scene unfolding over time. "
@@ -62,7 +64,8 @@ def evaluate_detect(model: Model, scenarios) -> tuple[float, float, int]:
     n_yes = 0
     for i in range(0, len(scenarios), BATCH_SIZE):
         batch = scenarios[i:i + BATCH_SIZE]
-        requests = [(s.frames, SWAP_PROMPT, s.scene_description) for s in batch]
+        prompts = [Prompt(s.frames, SWAP_PROMPT, s.scene_description) for s in batch]
+        requests = [(build_messages(p, MODEL_ID), p.images) for p in prompts]
         answers = model.ask_batch(requests, pattern=r"yes|no")
         for s, answer in zip(batch, answers):
             expected = "yes" if s.anomaly else "no"
@@ -79,7 +82,8 @@ def evaluate_localize(model: Model, scenarios) -> tuple[float, int]:
     n_correct = 0
     for i in range(0, len(scenarios), BATCH_SIZE):
         batch = scenarios[i:i + BATCH_SIZE]
-        requests = [(s.frames, LOCALIZE_PROMPT, s.scene_description) for s in batch]
+        prompts = [Prompt(s.frames, LOCALIZE_PROMPT, s.scene_description) for s in batch]
+        requests = [(build_messages(p, MODEL_ID), p.images) for p in prompts]
         answers = model.ask_batch(requests, pattern=r"\d+,\d+")
         for s, answer in zip(batch, answers):
             i0, j0 = s.position
@@ -101,7 +105,7 @@ def main():
         print(f"Unknown dataset key {home_key!r}, expected one of {list(DATASETS)}", file=sys.stderr)
         sys.exit(1)
 
-    model = Model("Qwen/Qwen3-VL-2B-Instruct", lora_path=lora_path, lora_rank=LORA_RANK)
+    model = Model(MODEL_ID, lora_path=lora_path, lora_rank=LORA_RANK)
 
     results = []
 

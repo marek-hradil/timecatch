@@ -18,7 +18,7 @@ import json
 
 from config import load
 from dataset import Dataset
-from inference import Model
+from inference import Model, Prompt, build_messages
 from results import Results
 
 
@@ -28,10 +28,11 @@ def main(cfg: dict) -> None:
         tensor_parallel_size=cfg["model"].get("tensor_parallel_size", 1),
         video_mode=cfg["model"].get("video_mode", False),
         max_model_len=cfg["model"].get("max_model_len"),
-        max_image_size=cfg["model"].get("max_image_size"),
         thinking=cfg["model"].get("thinking", False),
         enforce_eager=cfg["model"].get("enforce_eager", False),
     )
+    model_id = cfg["model"]["path"]
+    video_mode = cfg["model"].get("video_mode", False)
 
     manifest_path = cfg["human_manifest"]
     with open(manifest_path) as f:
@@ -66,10 +67,11 @@ def main(cfg: dict) -> None:
     batch_size = cfg.get("batch_size", len(scenarios))
     for i in range(0, len(scenarios), batch_size):
         batch = scenarios[i:i + batch_size]
-        requests = [
-            (s.frames, cfg["system_prompt"], s.scene_description if include_scene_desc else None)
+        prompts = [
+            Prompt(s.frames, cfg["system_prompt"], s.scene_description if include_scene_desc else None)
             for s in batch
         ]
+        requests = [(build_messages(p, model_id, video_mode), p.images) for p in prompts]
         answers = model.ask_batch(requests, pattern=r"yes|no")
         for s, answer in zip(batch, answers):
             results.log(s.name, len(s.frames), s.anomaly, answer)

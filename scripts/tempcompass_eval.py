@@ -24,8 +24,9 @@ from pathlib import Path
 from PIL import Image as PILImage
 
 sys.path.insert(0, str(Path(__file__).parent.parent))
-from inference import Model
+from inference import Model, Prompt, build_messages
 
+MODEL_ID = "Qwen/Qwen3-VL-2B-Instruct"
 ROOT = Path(__file__).parent.parent / "datasets" / "TempCompass"
 BATCH_SIZE = 64
 LORA_RANK = 8
@@ -45,7 +46,7 @@ def main():
     records = [r for r in records if (ROOT / "frames" / r["video_id"]).exists()]
     print(f"{len(records)} questions with frames available")
 
-    model = Model("Qwen/Qwen3-VL-2B-Instruct", lora_path=lora_path, lora_rank=LORA_RANK)
+    model = Model(MODEL_ID, lora_path=lora_path, lora_rank=LORA_RANK)
 
     results = []
     n_correct = 0
@@ -59,7 +60,8 @@ def main():
             frame_dir = ROOT / "frames" / r["video_id"]
             paths = sorted(frame_dir.glob("*.jpg"), key=lambda p: int(p.stem))
             frames = [PILImage.open(p).copy() for p in paths]
-            requests.append((frames, SYSTEM_PROMPT, r["question"]))
+            prompt = Prompt(frames, SYSTEM_PROMPT, r["question"])
+            requests.append((build_messages(prompt, MODEL_ID), prompt.images))
 
         answers = model.ask_batch(requests, pattern=r"yes|no")
         for r, answer in zip(batch, answers):
